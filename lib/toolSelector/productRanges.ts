@@ -1,7 +1,6 @@
 /**
- * Torque wrench (TSL/THL) and bolt tensioner (BTL) model ranges, extracted
- * from "Bolting & Machining Solutions Cata (IND) APAC.pdf" via pdfplumber
- * (TSL p.1/idx3, THL p.3/idx5, BTL p.13/idx15).
+ * Torque wrench (TSL/THL) model ranges, extracted from "Bolting & Machining
+ * Solutions Cata (IND) APAC.pdf" via pdfplumber (TSL p.1/idx3, THL p.3/idx5).
  */
 
 export interface TorqueWrenchModel {
@@ -38,30 +37,7 @@ export const THL_MODELS: TorqueWrenchModel[] = [
 
 export const ALL_TORQUE_WRENCH_MODELS: TorqueWrenchModel[] = [...TSL_MODELS, ...THL_MODELS];
 
-export interface BoltTensionerModel {
-  model: string;
-  series: "BTL";
-  cylinderForceKn: number;
-  metricSizes: string[];
-  inchSizes: string[];
-}
-
-export const BTL_MODELS: BoltTensionerModel[] = [
-  { model: "BTL-3", series: "BTL", cylinderForceKn: 234.2, metricSizes: ["M16", "M18", "M20", "M22", "M24"], inchSizes: ["3/4", "7/8", "1"] },
-  { model: "BTL-5", series: "BTL", cylinderForceKn: 498.2, metricSizes: ["M27", "M30", "M33", "M36"], inchSizes: ["1-1/8", "1-1/4", "1-3/8"] },
-  { model: "BTL-9", series: "BTL", cylinderForceKn: 896.8, metricSizes: ["M39", "M42", "M45", "M48"], inchSizes: ["1-1/2", "1-5/8", "1-3/4", "1-7/8"] },
-  { model: "BTL-13", series: "BTL", cylinderForceKn: 1245.0, metricSizes: ["M52", "M56", "M60"], inchSizes: ["2", "2-1/4"] },
-  { model: "BTL-19", series: "BTL", cylinderForceKn: 1843.3, metricSizes: ["M64", "M68", "M72", "M76"], inchSizes: ["2-1/2", "2-3/4", "3"] },
-  { model: "BTL-27", series: "BTL", cylinderForceKn: 2640.5, metricSizes: ["M76", "M80", "M85", "M90", "M95", "M100"], inchSizes: ["3", "3-1/4", "3-1/2", "3-3/4", "4"] },
-  { model: "BTL-37", series: "BTL", cylinderForceKn: 3768.0, metricSizes: ["M90", "M95", "M100", "M110"], inchSizes: ["3-1/2", "3-3/4", "4", "4-1/4"] },
-  { model: "BTL-44", series: "BTL", cylinderForceKn: 4335.0, metricSizes: ["M100", "M110", "M120", "M125"], inchSizes: ["4", "4-1/2", "4-3/4", "5"] },
-  { model: "BTL-54", series: "BTL", cylinderForceKn: 5404.0, metricSizes: ["M125", "M130", "M140", "M150"], inchSizes: ["5", "5-1/4", "5-1/2", "5-3/4"] },
-];
-
-export const ALL_METRIC_BOLT_SIZES: string[] = Array.from(
-  new Set(BTL_MODELS.flatMap((m) => m.metricSizes))
-);
-
-export const ALL_INCH_BOLT_SIZES: string[] = Array.from(
-  new Set(BTL_MODELS.flatMap((m) => m.inchSizes))
-);
+// Bolt tensioner (BTL) model data lives in ./btlModelTable.ts — richer
+// dimensional data feeding the full fitment-check engine in
+// ./btlFitmentRules.ts, superseding the old size-only lookup that used to
+// live here.

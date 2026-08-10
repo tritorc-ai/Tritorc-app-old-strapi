@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# ⚙️ Tritorc App
 
-First, run the development server:
+**A modern web app for Tritorc's tools, services, and product catalogue**
+
+Built with [Next.js](https://nextjs.org), [Tailwind CSS](https://tailwindcss.com), and [shadcn/ui](https://ui.shadcn.com)
+
+</div>
+
+---
+
+## ✨ Features
+
+- 🏠 **Home** — hero, impact stats, featured products, and case studies
+- 🧰 **Tool Selector** — guided flow to find the right torque wrench or bolt tensioner
+- 📦 **Products & Services** — browsable catalogues with detail pages
+- 🏢 **Company** — journey timeline and certifications
+- 📚 **Library** — media and resource browser
+- 📱 **PWA-ready** — installable with icons, manifest, and a service worker
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) + React 19 |
+| Styling | Tailwind CSS 4 |
+| UI Components | shadcn/ui + Radix UI |
+| Icons | Lucide |
+| Content | Strapi CMS (with local mock data fallback) |
+| Language | TypeScript |
+
+## 🚀 Getting Started
+
+Install dependencies and start the dev server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the app. Pages auto-update as you edit files.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/                  Routes (App Router)
+├── company/          Company & journey page
+├── library/          Media library
+├── products/         Product catalogue + detail pages
+├── services/         Services catalogue + detail pages
+└── tool-selector/     Guided tool selection flow
 
-## Learn More
+components/
+├── app/              Feature components (Hero, BottomNav, carousels, etc.)
+└── ui/               Reusable shadcn/ui primitives
 
-To learn more about Next.js, take a look at the following resources:
+lib/
+├── mock/             Placeholder content & images
+├── toolSelector/     Tool selection logic & spec tables
+└── strapi.ts         CMS data layer (Strapi + mock fallback)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📜 Available Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Build the app for production |
+| `npm run start` | Run the production build |
+| `npm run lint` | Lint the codebase |
 
-## Deploy on Vercel
+## 🌐 Content
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Product catalogues are wired to a live [Strapi](https://strapi.io) CMS instance. Other sections (stats, case studies, certifications, testimonials, etc.) currently use mock data in [`lib/mock`](lib/mock) until their content types are ready — see [`lib/strapi.ts`](lib/strapi.ts) for the swap points.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ☁️ Deployment
+
+The easiest way to deploy this app is via [Vercel](https://vercel.com/new), from the creators of Next.js. See the [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying) for other options.
+
+---
+
+<div align="center">
+<sub>Built with Next.js</sub>
+</div>

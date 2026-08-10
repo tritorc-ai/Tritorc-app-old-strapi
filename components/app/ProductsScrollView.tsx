@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { Product } from "@/lib/mock/content";
 
 export interface ScrollSection {
@@ -27,8 +26,22 @@ const CROP_VARIANTS = [
 export function ProductsScrollView({ sections }: { sections: ScrollSection[] }) {
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [showPill, setShowPill] = useState(false);
-  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Measured, not guessed: the page header's height varies with viewport
+  // width (its subtitle can wrap to a 2nd line on narrow screens), so a
+  // hardcoded pixel offset silently drifts out of sync and either overlaps
+  // the header or leaves a gap. Measure the real header height at runtime.
+  const [topOffset, setTopOffset] = useState(122);
+
+  useEffect(() => {
+    function measure() {
+      const header = document.querySelector<HTMLElement>(".sticky.top-0");
+      setTopOffset(header?.getBoundingClientRect().height ?? 122);
+    }
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
 
   const totalProducts = useMemo(
     () => sections.reduce((sum, s) => sum + s.products.length, 0),
@@ -36,37 +49,28 @@ export function ProductsScrollView({ sections }: { sections: ScrollSection[] }) 
   );
 
   useEffect(() => {
-    // Position-based (not crossing-based) scrollspy: on every scroll, find
-    // the last section whose top has passed the detection line. This is
-    // robust to fast/instant scrolling (e.g. dragging the rail or a jump
-    // scroll), unlike an IntersectionObserver keyed on edge-crossing, which
-    // can skip sections entirely when the scroll moves further than one
-    // viewport per frame.
-    const DETECTION_LINE = 110; // px from top of viewport
-
+    // This ONLY drives which dot the scroll rail highlights — purely
+    // cosmetic. The actual "category stays pinned until its cards scroll
+    // past, then the next one takes over" behavior below is native CSS
+    // `position: sticky` on each section's own header, which needs no
+    // JavaScript/scroll-listener at all to work correctly, unlike an
+    // earlier version of this component that drove a single shared header
+    // off a scroll-listener-computed index — if that listener ever missed
+    // a tick (throttling, background tab, etc.) the whole pin/handoff
+    // effect broke. Native sticky can't miss a tick; it's laid out by the
+    // browser's own scroll/paint pipeline every frame.
     function updateActiveSection() {
       let newIndex = 0;
       for (let i = 0; i < sectionRefs.current.length; i++) {
         const el = sectionRefs.current[i];
         if (!el) continue;
-        if (el.getBoundingClientRect().top <= DETECTION_LINE) {
+        if (el.getBoundingClientRect().top <= topOffset + 40) {
           newIndex = i;
         }
       }
-      setActiveIndex((prev) => {
-        if (prev !== newIndex) {
-          setShowPill(true);
-          if (hideTimer.current) clearTimeout(hideTimer.current);
-          hideTimer.current = setTimeout(() => setShowPill(false), 1200);
-        }
-        return newIndex;
-      });
+      setActiveIndex(newIndex);
     }
 
-    // setTimeout throttle rather than requestAnimationFrame — rAF can be
-    // paused/throttled in background tabs or low-power mode, and this
-    // update is cheap enough (a handful of getBoundingClientRect reads)
-    // that a small time-based throttle is all it needs.
     let throttled = false;
     function onScroll() {
       if (throttled) return;
@@ -80,32 +84,14 @@ export function ProductsScrollView({ sections }: { sections: ScrollSection[] }) 
     updateActiveSection();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [sections]);
+  }, [sections, topOffset]);
 
   function scrollToSection(i: number) {
     sectionRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  const active = sections[activeIndex];
-
   return (
     <div className="relative">
-      {/* Floating current-section pill */}
-      <div
-        className={cn(
-          "pointer-events-none fixed left-1/2 top-[64px] z-30 -translate-x-1/2 transition-all duration-300",
-          showPill ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
-        )}
-      >
-        <div className="flex items-center gap-2 rounded-full bg-brand-dark/95 px-3.5 py-2 shadow-[0_8px_20px_rgba(0,0,0,.25)] backdrop-blur">
-          <span
-            className="h-2 w-2 shrink-0 rounded-full"
-            style={{ background: active?.color }}
-          />
-          <span className="text-[12px] font-semibold text-white">{active?.name}</span>
-        </div>
-      </div>
-
       {/* Color-coded scroll rail */}
       <div className="fixed right-1.5 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-[3px]">
         {sections.map((s, i) => {
@@ -149,13 +135,15 @@ export function ProductsScrollView({ sections }: { sections: ScrollSection[] }) 
           ref={(el) => {
             sectionRefs.current[i] = el;
           }}
-          className="mt-7 scroll-mt-[90px] first:mt-0"
+          className="mt-7 first:mt-0"
+          style={{ scrollMarginTop: topOffset }}
         >
-          <div className="mb-3 flex items-center gap-2.5">
+          <div
+            className="sticky z-10 -mx-5 mb-3 flex items-center gap-2.5 bg-brand-surface px-5 py-2"
+            style={{ top: topOffset }}
+          >
             <div className="h-6 w-1 shrink-0 rounded-sm" style={{ background: section.color }} />
-            <div className="text-[19px] font-bold leading-tight text-brand-dark">
-              {section.name}
-            </div>
+            <div className="text-[19px] font-bold leading-tight text-brand-dark">{section.name}</div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {(() => {

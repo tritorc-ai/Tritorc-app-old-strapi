@@ -20,7 +20,7 @@ import { ServicesPreviewGrid } from "@/components/app/ServicesPreviewGrid";
 import { FeaturedProductsRow } from "@/components/app/FeaturedProductsRow";
 
 export default async function HomePage() {
-  const [brand, stats, caseStudies, certifications, journey, services, products, images] =
+  const [brand, stats, caseStudies, certifications, journey, services, sections, products, images] =
     await Promise.all([
       getBrand(),
       getImpactStats(),
@@ -28,9 +28,26 @@ export default async function HomePage() {
       getCertifications(),
       getJourney(),
       getServices(),
+      getServiceSections(),
       getProducts(),
       getImageUrls(),
     ]);
+
+  // One card per top-level category (not per sub-service) — links to that
+  // category's first real sub-service, since services don't have their own
+  // landing page, only individual detail pages.
+  const servicePreviews = sections
+    .map((section) => {
+      const first = services.find((s) => section.categories.includes(s.category));
+      if (!first) return null;
+      return {
+        slug: first.slug,
+        name: section.name,
+        tagline: first.tagline,
+        imageUrl: first.directImageUrl ?? (first.imageKey ? images[first.imageKey] : undefined),
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null);
 
   return (
     <div>
@@ -68,9 +85,7 @@ export default async function HomePage() {
           }))}
         />
         <JourneyTimeline journey={journey} />
-        <ServicesPreviewGrid
-          services={services.map((s) => ({ ...s, imageUrl: images[s.imageKey] }))}
-        />
+        <ServicesPreviewGrid services={servicePreviews} />
         <FeaturedProductsRow
           products={products.slice(0, 6).map((p) => ({
             ...p,

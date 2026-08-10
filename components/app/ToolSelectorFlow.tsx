@@ -9,19 +9,19 @@ import {
   getAvailableNominalSizes,
   type PressureClass,
 } from "@/lib/toolSelector/flangeSizeTable";
-import { METRIC_TORQUE_TABLE } from "@/lib/toolSelector/torqueSpecTable";
-import { ALL_METRIC_BOLT_SIZES, ALL_INCH_BOLT_SIZES } from "@/lib/toolSelector/productRanges";
+import { METRIC_TORQUE_TABLE, ALL_IMPERIAL_BOLT_SIZES } from "@/lib/toolSelector/torqueSpecTable";
 import {
   selectByFlangeSpec,
   selectByBoltSpec,
   type TorqueWrenchResult,
 } from "@/lib/toolSelector/selectTorqueWrench";
-import { selectBoltTensioner, type BoltTensionerResult } from "@/lib/toolSelector/selectBoltTensioner";
+import { BtlQuickMatchFlow, type QuickMatchSeed } from "@/components/app/tool-selector/BtlQuickMatchFlow";
+import { BtlFullFitmentFlow } from "@/components/app/tool-selector/BtlFullFitmentFlow";
 
 type Category = "picker" | "torque" | "tensioner";
 type TorqueMode = "flange" | "bolt-size";
 
-function StepBar({ step }: { step: 1 | 2 }) {
+export function StepBar({ step }: { step: 1 | 2 }) {
   return (
     <div className="mt-3.5 flex items-center gap-2">
       <div className="flex items-center gap-1.5">
@@ -46,7 +46,32 @@ function StepBar({ step }: { step: 1 | 2 }) {
   );
 }
 
-function Select({
+/** Multi-step progress indicator for flows with more than 2 steps (e.g. the
+ * BTL Full Fitment Check). Kept separate from StepBar rather than extending
+ * its props, so existing 2-step call sites (TorqueWrenchFlow, Quick Match)
+ * are untouched. */
+export function StepProgress({ current, total, label }: { current: number; total: number; label: string }) {
+  return (
+    <div className="border-b border-black/6 bg-brand-surface px-5 pb-4">
+      <div className="flex items-center gap-1.5">
+        {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
+          <div
+            key={n}
+            className={cn(
+              "h-1.5 flex-1 rounded-full",
+              n < current ? "bg-brand-red" : n === current ? "bg-brand-red" : "bg-black/10"
+            )}
+          />
+        ))}
+      </div>
+      <div className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-brand-text-tertiary">
+        Step {current} of {total} · {label}
+      </div>
+    </div>
+  );
+}
+
+export function Select({
   label,
   value,
   onChange,
@@ -78,7 +103,7 @@ function Select({
   );
 }
 
-function SegmentedToggle<T extends string>({
+export function SegmentedToggle<T extends string>({
   value,
   onChange,
   options,
@@ -181,7 +206,7 @@ function TorqueWrenchFlow({ onBack }: { onBack: () => void }) {
 
   const [boltKind, setBoltKind] = useState<"metric" | "imperial">("metric");
   const [metricSize, setMetricSize] = useState(METRIC_TORQUE_TABLE[0].size);
-  const [imperialSize, setImperialSize] = useState(ALL_INCH_BOLT_SIZES[0]);
+  const [imperialSize, setImperialSize] = useState(ALL_IMPERIAL_BOLT_SIZES[0]);
   const [grade, setGrade] = useState<"8.8" | "10.9" | "12.9">("8.8");
 
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -282,7 +307,7 @@ function TorqueWrenchFlow({ onBack }: { onBack: () => void }) {
                 label='Bolt Diameter (in)'
                 value={imperialSize}
                 onChange={setImperialSize}
-                options={ALL_INCH_BOLT_SIZES}
+                options={ALL_IMPERIAL_BOLT_SIZES}
               />
             )}
           </div>
@@ -316,89 +341,30 @@ function TorqueWrenchFlow({ onBack }: { onBack: () => void }) {
   );
 }
 
-function TensionerResultCard({ result }: { result: BoltTensionerResult }) {
-  const [primary] = result.matches;
-  return (
-    <div className="px-5 pb-7">
-      {primary ? (
-        <div className="rounded-xl border border-black/6 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,.03),0_12px_26px_rgba(0,0,0,.1)]">
-          <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-brand-red">
-            Recommended
-          </div>
-          <div className="mt-1 text-2xl font-extrabold text-brand-dark">{primary.model}</div>
-          <div className="mt-1 text-[13px] text-brand-text-secondary">
-            Cylinder Force: {primary.cylinderForceKn.toLocaleString()} kN
-          </div>
-          <div className="mt-4 flex gap-2.5">
-            <Link
-              href="/products"
-              className="flex-1 rounded-lg bg-linear-to-br from-brand-red to-brand-red-bright py-2.75 text-center text-[13px] font-semibold text-white"
-            >
-              View Product
-            </Link>
-            <a
-              href="#"
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-black/10 py-2.75 text-[13px] font-semibold text-brand-dark"
-            >
-              <Download size={14} /> Spec Sheet
-            </a>
-          </div>
-        </div>
-      ) : (
-        <div className="rounded-lg border border-black/6 bg-white p-5 text-sm text-brand-text-secondary">
-          No exact model match for {result.size} — please contact Tritorc for a custom solution.
-        </div>
-      )}
-    </div>
-  );
-}
+/** Router for the "Bolt Tensioners" tile: Quick Match is the fast default
+ * path; "Run Full Fitment Check" from a Quick Match result steps up into
+ * the full engineering flow, carrying the already-known bolt size/flange
+ * spec forward so nothing already entered has to be re-typed. */
+function BoltTensionerFlow({ onBack }: { onBack: () => void }) {
+  const [showFullCheck, setShowFullCheck] = useState(false);
+  const [seed, setSeed] = useState<QuickMatchSeed | undefined>(undefined);
 
-function TensionerFlow({ onBack }: { onBack: () => void }) {
-  const [kind, setKind] = useState<"metric" | "imperial">("metric");
-  const [size, setSize] = useState(ALL_METRIC_BOLT_SIZES[0]);
-  const [result, setResult] = useState<BoltTensionerResult | null>(null);
-
-  const sizeOptions = kind === "metric" ? ALL_METRIC_BOLT_SIZES : ALL_INCH_BOLT_SIZES;
-
-  if (result) {
-    return (
-      <div>
-        <Header title="Find My Tool" onBack={() => setResult(null)} />
-        <TensionerResultCard result={result} />
-      </div>
-    );
+  if (showFullCheck) {
+    return <BtlFullFitmentFlow seed={seed} onBack={() => setShowFullCheck(false)} />;
   }
 
   return (
-    <div>
-      <Header title="Find My Tool" onBack={onBack} />
-      <div className="px-5 pb-7 pt-6">
-        <div className="flex flex-col gap-4">
-          <SegmentedToggle
-            value={kind}
-            onChange={(v) => {
-              setKind(v);
-              setSize(v === "metric" ? ALL_METRIC_BOLT_SIZES[0] : ALL_INCH_BOLT_SIZES[0]);
-            }}
-            options={[
-              { value: "metric", label: "Metric" },
-              { value: "imperial", label: "Imperial" },
-            ]}
-          />
-          <Select label="Bolt Size" value={size} onChange={setSize} options={sizeOptions} />
-        </div>
-        <button
-          onClick={() => setResult(selectBoltTensioner(kind, size))}
-          className="mt-6 w-full rounded-lg bg-linear-to-br from-brand-red to-brand-red-bright py-3.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(214,49,47,.4)]"
-        >
-          Find My Tool →
-        </button>
-      </div>
-    </div>
+    <BtlQuickMatchFlow
+      onBack={onBack}
+      onUpgrade={(s) => {
+        setSeed(s);
+        setShowFullCheck(true);
+      }}
+    />
   );
 }
 
-function Header({ title, onBack, step }: { title: string; onBack: () => void; step?: 1 | 2 }) {
+export function Header({ title, onBack, step }: { title: string; onBack: () => void; step?: 1 | 2 }) {
   return (
     <div className="sticky top-0 z-10 border-b border-black/6 bg-brand-surface px-5 pb-4 pt-[54px]">
       <div className="flex items-center gap-3">
@@ -419,7 +385,7 @@ export function ToolSelectorFlow() {
     return <TorqueWrenchFlow onBack={() => setCategory("picker")} />;
   }
   if (category === "tensioner") {
-    return <TensionerFlow onBack={() => setCategory("picker")} />;
+    return <BoltTensionerFlow onBack={() => setCategory("picker")} />;
   }
 
   return (

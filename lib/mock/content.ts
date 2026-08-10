@@ -168,7 +168,10 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
   { name: "Onsite Controlled Bolting", imageKey: "productTorqueHero" },
   { name: "Pipeline Coldcutting & Bevelling", imageKey: "catPipeColdCutting" },
   { name: "Flange Facing", imageKey: "catFlangeFacing" },
-  { name: "On-Site Milling", imageKey: "svcOnSiteMachining" },
+  {
+    name: "On-Site Milling",
+    directImageUrl: "https://www.tritorc.com/assets/services/Oniste%20Machining.jpg",
+  },
   {
     name: "Magnetic Drilling Machine",
     directImageUrl: "https://www.tritorc.com/assets/services/pro/mgntic.webp",
@@ -180,7 +183,10 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
   { name: "Nitrogen Helium Leak Testing Services", imageKey: "svcPipelineIntegrity" },
   { name: "Nitrogen Purging Preservation Services", imageKey: "svcNitrogenPurging" },
   { name: "Pneumatic Testing", imageKey: "svcPipelineIntegrity" },
-  { name: "Retubing Services", imageKey: "caseSamsung" },
+  {
+    name: "Retubing Services",
+    directImageUrl: "https://www.tritorc.com/assets/services/Retubing.jpg",
+  },
   { name: "Emergency Pipeline Repair Clamp", imageKey: "svcHotTapping" },
   { name: "Hot Tapping & Line Stopping", imageKey: "svcHotTapping" },
   { name: "Online Leak Sealing", imageKey: "svcHotTapping" },
@@ -225,7 +231,7 @@ export const SERVICES: Service[] = [
     tagline: "Precision milling, no facility downtime",
     description:
       "On-site milling operations brought directly to your facility, eliminating the need for costly equipment removal and transport.",
-    imageKey: "svcOnSiteMachining",
+    directImageUrl: "https://www.tritorc.com/assets/services/Oniste%20Machining.jpg",
     media: [],
   },
   {
@@ -308,16 +314,7 @@ export const SERVICES: Service[] = [
     category: "Retubing Services",
     tagline: "Heat exchanger tube replacement",
     description: "Complete retubing solutions for heat exchangers and industrial equipment.",
-    imageKey: "caseSamsung",
-    media: [],
-  },
-  {
-    slug: "emergency-pipeline-repair-clamp",
-    name: "Emergency Pipeline Repair Clamp",
-    category: "Emergency Pipeline Repair Clamp",
-    tagline: "Immediate leak containment",
-    description: "Emergency repair clamp solutions for immediate pipeline leak containment.",
-    imageKey: "svcHotTapping",
+    directImageUrl: "https://www.tritorc.com/assets/services/Retubing.jpg",
     media: [],
   },
   {
@@ -326,6 +323,15 @@ export const SERVICES: Service[] = [
     category: "Hot Tapping & Line Stopping",
     tagline: "Live pipeline modification, zero downtime",
     description: "Safe hot tapping and line stopping services for live pipeline modifications.",
+    imageKey: "svcHotTapping",
+    media: [],
+  },
+  {
+    slug: "emergency-pipeline-repair-clamp",
+    name: "Emergency Pipeline Repair Clamp",
+    category: "Emergency Pipeline Repair Clamp",
+    tagline: "Immediate leak containment",
+    description: "Emergency repair clamp solutions for immediate pipeline leak containment.",
     imageKey: "svcHotTapping",
     media: [],
   },

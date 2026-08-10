@@ -74,6 +74,8 @@ export const IMPERIAL_TORQUE_TABLE: { size: string; torque: [number, number, num
   { size: "4", torque: [41712, 56610, 71507] },
 ];
 
+export const ALL_IMPERIAL_BOLT_SIZES: string[] = IMPERIAL_TORQUE_TABLE.map((r) => r.size);
+
 const LUBE_INDEX: Record<Lubrication, 0 | 1 | 2> = {
   lubricated: 0,
   "semi-lubricated": 1,
