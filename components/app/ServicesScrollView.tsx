@@ -35,7 +35,7 @@ export function ServicesScrollView({ sections }: { sections: ServiceScrollSectio
   useEffect(() => {
     function measure() {
       const header = document.querySelector<HTMLElement>(".sticky.top-0");
-      setTopOffset(header?.getBoundingClientRect().height ?? 122);
+      setTopOffset(Math.round(header?.getBoundingClientRect().height ?? 122));
     }
     measure();
     window.addEventListener("resize", measure);
@@ -48,49 +48,66 @@ export function ServicesScrollView({ sections }: { sections: ServiceScrollSectio
   );
 
   useEffect(() => {
-    // This ONLY drives which dot the scroll rail highlights — purely
-    // cosmetic. The actual "category stays pinned until its cards scroll
-    // past, then the next one takes over" behavior below is native CSS
-    // `position: sticky` on each section's own header, which needs no
-    // JavaScript/scroll-listener at all to work correctly, unlike an
-    // earlier version of this component that drove a single shared header
-    // off a scroll-listener-computed index — if that listener ever missed
-    // a tick (throttling, background tab, etc.) the whole pin/handoff
-    // effect broke. Native sticky can't miss a tick; it's laid out by the
-    // browser's own scroll/paint pipeline every frame.
+    // Two independent sticky headers handing off to one another always
+    // leaves a brief window where neither is definitively "the" active one
+    // (one has just released, the next hasn't reached its own lock point
+    // yet) — mathematically each one's own position tracks perfectly, but
+    // the handoff between two separate elements still reads as unstable.
+    // A single persistent header avoids that entirely: only one element
+    // ever exists, so there's nothing to hand off between.
+    //
+    // IntersectionObserver (not a scroll+setTimeout poll) drives which
+    // section is "active" here — it's event-driven off the browser's own
+    // layout/paint pipeline, the same one position:sticky itself uses, so
+    // it can't be starved by JS timer throttling the way a polled listener
+    // can. Multiple thresholds just give it plenty of chances to refire as
+    // each section crosses the viewport; the actual index is still decided
+    // by the same reliable position check every time it fires.
     function updateActiveSection() {
       let newIndex = 0;
       for (let i = 0; i < sectionRefs.current.length; i++) {
         const el = sectionRefs.current[i];
         if (!el) continue;
-        if (el.getBoundingClientRect().top <= topOffset + 40) {
+        if (el.getBoundingClientRect().top <= topOffset + 1) {
           newIndex = i;
         }
       }
       setActiveIndex(newIndex);
     }
 
-    let throttled = false;
-    function onScroll() {
-      if (throttled) return;
-      throttled = true;
-      setTimeout(() => {
-        updateActiveSection();
-        throttled = false;
-      }, 100);
+    const observer = new IntersectionObserver(updateActiveSection, {
+      threshold: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
+    });
+    for (const el of sectionRefs.current) {
+      if (el) observer.observe(el);
     }
-
     updateActiveSection();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => observer.disconnect();
   }, [sections, topOffset]);
 
   function scrollToSection(i: number) {
     sectionRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  const active = sections[activeIndex];
+
   return (
     <div className="relative">
+      {/* Single persistent sticky category header — see the effect above
+          for why this reads more stable than per-section sticky headers. */}
+      <div
+        className="sticky z-10 -mx-5 mb-3 bg-brand-surface px-5 py-2"
+        style={{ top: topOffset }}
+      >
+        <div
+          key={activeIndex}
+          className="flex items-center gap-2.5 animate-in fade-in slide-in-from-top-1 duration-200"
+        >
+          <div className="h-6 w-1 shrink-0 rounded-sm" style={{ background: active?.color }} />
+          <div className="text-[19px] font-bold leading-tight text-brand-dark">{active?.name}</div>
+        </div>
+      </div>
+
       {/* Color-coded scroll rail */}
       <div className="fixed right-1.5 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-[3px]">
         {sections.map((s, i) => {
@@ -122,13 +139,6 @@ export function ServicesScrollView({ sections }: { sections: ServiceScrollSectio
           className="mt-7 first:mt-0"
           style={{ scrollMarginTop: topOffset }}
         >
-          <div
-            className="sticky z-10 -mx-5 mb-3 flex items-center gap-2.5 bg-brand-surface px-5 py-2"
-            style={{ top: topOffset }}
-          >
-            <div className="h-6 w-1 shrink-0 rounded-sm" style={{ background: section.color }} />
-            <div className="text-[19px] font-bold leading-tight text-brand-dark">{section.name}</div>
-          </div>
           <div className="grid grid-cols-2 gap-3">
             {(() => {
               const seenCount = new Map<string, number>();
