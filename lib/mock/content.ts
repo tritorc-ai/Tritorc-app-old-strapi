@@ -21,7 +21,10 @@ export interface CaseStudy {
   stat: string;
   statLabel: string;
   meta: string;
-  imageKey: ImageKey;
+  imageKey?: ImageKey;
+  // Real project photos sourced directly from tritorc.com's own blog posts —
+  // same pattern as Product/Service directImageUrl, no re-hosting needed.
+  directImageUrl?: string;
 }
 
 export const CASE_STUDIES: CaseStudy[] = [
@@ -61,6 +64,33 @@ export const CASE_STUDIES: CaseStudy[] = [
     meta: "Empowering NCOC's high-pressure onshore facility — up to 40-80 MPa H2S sour gas. Delivered a 69,247 Nm hydraulic torque wrench, 5,406 kN bolt tensioner, and 72\" pipe cutting machine work.",
     imageKey: "caseKarabatan",
   },
+  // Sourced directly from tritorc.com/blog (real, dated project write-ups) —
+  // images link to tritorc.com's own hosting, not re-hosted.
+  {
+    slug: "ongc-nqp-hot-tapping",
+    name: "ONGC NQP Offshore Platform, India",
+    stat: "16\"",
+    statLabel: "Live pipeline hot-tapped, zero downtime",
+    meta: "Hot tapping a live 16\" pipeline to add a 12\" branch connection with no shutdown and no interruption to hydrocarbon flow — commended by both L&T and ONGC for execution.",
+    directImageUrl:
+      "https://tritorc.com/blog/add/2025/06/Tritorc-Team-holding-the-tocken-after-sucessful-hot-tapping-operation-scaled.webp",
+  },
+  {
+    slug: "adnoc-sarb-leak-testing",
+    name: "ADNOC SARB Accelerated Growth Project, UAE",
+    stat: "276",
+    statLabel: "Barg tested, 1\"-6\" critical process piping",
+    meta: "Nitrogen-Helium leak testing (1% He / 99% N2) for early tie-in of production wells at AlQatia, SARB North Artificial Island — precision detection where even a micro-leak was a safety risk.",
+    directImageUrl: "https://tritorc.com/blog/add/2025/06/Tritorc-Leak-Testing.webp",
+  },
+  {
+    slug: "new-pamban-bridge",
+    name: "The New Pamban Bridge, India",
+    stat: "2.08km",
+    statLabel: "India's first vertical-lift sea bridge",
+    meta: "Heavy-duty impact sockets, stack sockets, and impact reducers supplied for the bridge's gear couplings and bearing housings — precision bolting across a wide range of bolt sizes and torque specs.",
+    directImageUrl: "https://tritorc.com/blog/add/2025/06/pamban-railway-bridge-in-india.webp",
+  },
 ];
 
 export interface Certification {
@@ -72,6 +102,40 @@ export interface Certification {
 export const CERTIFICATIONS: Certification[] = [
   { code: "ISO", name: "ISO 9001:2015", description: "Certified quality management" },
   { code: "CE", name: "CE-Certified Tools", description: "Meets EU safety standards" },
+  { code: "ECITB", name: "ECITB-Accredited", description: "Engineering construction industry training standard" },
+];
+
+export interface CoreValue {
+  name: string;
+  description: string;
+}
+
+// Sourced from tritorc.com/about-us.
+export const CORE_VALUES: CoreValue[] = [
+  { name: "Safety", description: "Ensuring safe practices in every operation" },
+  { name: "Synergy", description: "Fostering collaboration across teams and clients" },
+  { name: "Integrity", description: "Acting with honesty in every engagement" },
+  { name: "Compassion", description: "Leading with empathy" },
+  { name: "Innovation", description: "Driving progress through continuous innovation" },
+];
+
+export interface GlobalOffice {
+  city: string;
+  country: string;
+}
+
+// Sourced from tritorc.com/LinkedIn company profile.
+export const GLOBAL_OFFICES: GlobalOffice[] = [
+  { city: "Mumbai", country: "India" },
+  { city: "Pune", country: "India" },
+  { city: "Ambernath", country: "India" },
+  { city: "Pasadena, Texas", country: "USA" },
+  { city: "Sharjah", country: "UAE" },
+  { city: "Abu Dhabi", country: "UAE" },
+  { city: "Boumerdes", country: "Algeria" },
+  { city: "Muscat", country: "Oman" },
+  { city: "Edmonton", country: "Canada" },
+  { city: "Dortmund", country: "Germany" },
 ];
 
 export interface JourneyMilestone {
@@ -107,6 +171,7 @@ export interface Service {
   imageKey?: ImageKey;
   directImageUrl?: string;
   media: ServiceMediaAsset[];
+  catalogue?: { title: string; meta: string; url: string } | null;
 }
 
 export interface ServiceCategory {
@@ -177,23 +242,40 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     directImageUrl: "https://www.tritorc.com/assets/services/pro/mgntic.webp",
   },
   { name: "Portable Water Jet Cutting", imageKey: "svcOnSiteMachining" },
-  { name: "Dewatering & Dry Air Flushing Services", imageKey: "svcPipelineIntegrity" },
-  { name: "Hydro Testing Services", imageKey: "svcPipelineIntegrity" },
-  { name: "Lube-oil Flushing Services", imageKey: "svcPipelineIntegrity" },
-  { name: "Nitrogen Helium Leak Testing Services", imageKey: "svcPipelineIntegrity" },
+  { name: "Dewatering & Dry Air Flushing Services", imageKey: "svcDewatering" },
+  { name: "Hydro Testing Services", imageKey: "svcHydroTesting" },
+  { name: "Lube-oil Flushing Services", imageKey: "svcLubeOilFlushing" },
+  { name: "Nitrogen Helium Leak Testing Services", imageKey: "svcNitrogenHeliumLeak" },
   { name: "Nitrogen Purging Preservation Services", imageKey: "svcNitrogenPurging" },
-  { name: "Pneumatic Testing", imageKey: "svcPipelineIntegrity" },
+  { name: "Pneumatic Testing", imageKey: "svcPneumaticTesting" },
   {
     name: "Retubing Services",
     directImageUrl: "https://www.tritorc.com/assets/services/Retubing.jpg",
   },
-  { name: "Emergency Pipeline Repair Clamp", imageKey: "svcHotTapping" },
+  { name: "Emergency Pipeline Repair Clamp", imageKey: "svcEmergencyRepairClamp" },
   { name: "Hot Tapping & Line Stopping", imageKey: "svcHotTapping" },
-  { name: "Online Leak Sealing", imageKey: "svcHotTapping" },
+  { name: "Online Leak Sealing", imageKey: "svcOnlineLeakSealing" },
   { name: "Pipe Freezing", imageKey: "svcPipeFreezing" },
-  { name: "Calibration Services", imageKey: "productSpecDiagram" },
+  { name: "Calibration Services", imageKey: "svcCalibration" },
   { name: "Dry Rental", imageKey: "svcDryRental" },
 ];
+
+const HOT_TAPPING_CATALOGUE = {
+  title: "Hot Tapping Cata",
+  meta: "Updated Aug 2026",
+  url: "#",
+};
+const WATERJET_CATALOGUE = { title: "Waterjet Cutting", meta: "Updated Aug 2026", url: "#" };
+const ONSITE_MACHINING_SERVICE_CATALOGUE = {
+  title: "On-Site Machining (Service)",
+  meta: "Updated Aug 2026",
+  url: "#",
+};
+const PIPELINE_PROCESS_CATALOGUE = {
+  title: "Pipeline Process Services",
+  meta: "Updated Aug 2026",
+  url: "#",
+};
 
 export const SERVICES: Service[] = [
   {
@@ -202,7 +284,7 @@ export const SERVICES: Service[] = [
     category: "Onsite Controlled Bolting",
     tagline: "Precision torque, delivered in the field",
     description:
-      "Professional controlled bolting services with precision torque application for critical industrial applications and maintenance operations.",
+      "Professional controlled bolting services with precision torque application for critical industrial applications and maintenance operations. Torqueing up to 700 bar / 69,427 Nm max, bolts 19-175mm; tensioning up to 1,500 bar / 5,406 kN max, bolts 16-150mm.",
     imageKey: "productTorqueHero",
     media: [],
   },
@@ -233,6 +315,7 @@ export const SERVICES: Service[] = [
       "On-site milling operations brought directly to your facility, eliminating the need for costly equipment removal and transport.",
     directImageUrl: "https://www.tritorc.com/assets/services/Oniste%20Machining.jpg",
     media: [],
+    catalogue: ONSITE_MACHINING_SERVICE_CATALOGUE,
   },
   {
     slug: "magnetic-drilling-machine",
@@ -253,6 +336,7 @@ export const SERVICES: Service[] = [
       "Portable water jet cutting equipment for precise, spark-free cutting in hazardous or confined industrial environments.",
     imageKey: "svcOnSiteMachining",
     media: [],
+    catalogue: WATERJET_CATALOGUE,
   },
   {
     slug: "dewatering-dry-air-flushing",
@@ -260,17 +344,20 @@ export const SERVICES: Service[] = [
     category: "Dewatering & Dry Air Flushing Services",
     tagline: "Pipeline commissioning support",
     description: "Complete dewatering and dry air flushing solutions for pipeline commissioning.",
-    imageKey: "svcPipelineIntegrity",
+    imageKey: "svcDewatering",
     media: [],
+    catalogue: PIPELINE_PROCESS_CATALOGUE,
   },
   {
     slug: "hydro-testing-services",
     name: "Hydro Testing Services",
     category: "Hydro Testing Services",
     tagline: "Verifying pipeline integrity and safety",
-    description: "Comprehensive hydrostatic testing services to verify pipeline integrity and safety.",
-    imageKey: "svcPipelineIntegrity",
+    description:
+      "Comprehensive hydrostatic testing services to verify pipeline integrity and safety, up to 6,400 bar. Air-driven — no electricity required. MRS testing per ISO 9080/ASTM D2837, with ISO/ASTM/ASME-compliant reporting.",
+    imageKey: "svcHydroTesting",
     media: [],
+    catalogue: PIPELINE_PROCESS_CATALOGUE,
   },
   {
     slug: "lube-oil-flushing-services",
@@ -278,8 +365,9 @@ export const SERVICES: Service[] = [
     category: "Lube-oil Flushing Services",
     tagline: "System cleanliness and performance",
     description: "Professional lube oil flushing services for optimal system cleanliness and performance.",
-    imageKey: "svcPipelineIntegrity",
+    imageKey: "svcLubeOilFlushing",
     media: [],
+    catalogue: PIPELINE_PROCESS_CATALOGUE,
   },
   {
     slug: "nitrogen-helium-leak-testing",
@@ -287,8 +375,9 @@ export const SERVICES: Service[] = [
     category: "Nitrogen Helium Leak Testing Services",
     tagline: "Advanced leak detection",
     description: "Advanced leak detection services using nitrogen and helium testing methods.",
-    imageKey: "svcPipelineIntegrity",
+    imageKey: "svcNitrogenHeliumLeak",
     media: [],
+    catalogue: PIPELINE_PROCESS_CATALOGUE,
   },
   {
     slug: "nitrogen-purging-preservation",
@@ -298,6 +387,7 @@ export const SERVICES: Service[] = [
     description: "Nitrogen purging and preservation services to protect pipeline systems.",
     imageKey: "svcNitrogenPurging",
     media: [],
+    catalogue: PIPELINE_PROCESS_CATALOGUE,
   },
   {
     slug: "pneumatic-testing",
@@ -305,15 +395,17 @@ export const SERVICES: Service[] = [
     category: "Pneumatic Testing",
     tagline: "Pressure vessel and pipeline validation",
     description: "Reliable pneumatic testing services for pressure vessel and pipeline validation.",
-    imageKey: "svcPipelineIntegrity",
+    imageKey: "svcPneumaticTesting",
     media: [],
+    catalogue: PIPELINE_PROCESS_CATALOGUE,
   },
   {
     slug: "retubing-services",
     name: "Retubing Services",
     category: "Retubing Services",
     tagline: "Heat exchanger tube replacement",
-    description: "Complete retubing solutions for heat exchangers and industrial equipment.",
+    description:
+      "Complete retubing solutions for heat exchangers and industrial equipment: tube removal (1/2\"-4-1/2\" OD, pulling force to 22 T), tube insertion/expansion (3/8\"-2-1/2\" OD), tube sheet prep, weld overlay (GTAW/FCAW/SAW), and tube plugging (up to 7,000 psi).",
     directImageUrl: "https://www.tritorc.com/assets/services/Retubing.jpg",
     media: [],
   },
@@ -322,9 +414,11 @@ export const SERVICES: Service[] = [
     name: "Hot Tapping & Line Stopping",
     category: "Hot Tapping & Line Stopping",
     tagline: "Live pipeline modification, zero downtime",
-    description: "Safe hot tapping and line stopping services for live pipeline modifications.",
+    description:
+      "Safe hot tapping and line stopping services for live pipeline modifications. Pipe dia 2\"-84\" (50-2100mm), pressure to 100 bar (1,450 psi), temp -20°C to 280°C, materials CS/SS/Duplex/HDPE. Compliant with ASME B31.3/4/8, API 1104 App B, API 2201.",
     imageKey: "svcHotTapping",
     media: [],
+    catalogue: HOT_TAPPING_CATALOGUE,
   },
   {
     slug: "emergency-pipeline-repair-clamp",
@@ -332,7 +426,7 @@ export const SERVICES: Service[] = [
     category: "Emergency Pipeline Repair Clamp",
     tagline: "Immediate leak containment",
     description: "Emergency repair clamp solutions for immediate pipeline leak containment.",
-    imageKey: "svcHotTapping",
+    imageKey: "svcEmergencyRepairClamp",
     media: [],
   },
   {
@@ -341,7 +435,7 @@ export const SERVICES: Service[] = [
     category: "Online Leak Sealing",
     tagline: "No system shutdown required",
     description: "Advanced online leak sealing solutions without system shutdown.",
-    imageKey: "svcHotTapping",
+    imageKey: "svcOnlineLeakSealing",
     media: [],
   },
   {
@@ -359,7 +453,7 @@ export const SERVICES: Service[] = [
     category: "Calibration Services",
     tagline: "Accuracy and compliance, verified",
     description: "Precision tool calibration services to ensure accuracy and compliance.",
-    imageKey: "productSpecDiagram",
+    imageKey: "svcCalibration",
     media: [],
   },
   {
@@ -525,6 +619,8 @@ export const PRODUCTS: Product[] = [
       { label: "Max. Torque", value: "30,461 Nm" },
       { label: "Square Drive", value: '2.1/2"' },
       { label: "Tool Weight", value: "26 kg" },
+      { label: "Accuracy", value: "±3%" },
+      { label: "Duty Cycles", value: "5,000+" },
     ],
     media: [],
     catalogue: BOLTING_CATALOGUE,
@@ -555,6 +651,9 @@ export const PRODUCTS: Product[] = [
     specs: [
       { label: "Application", value: "Foundation bolting" },
       { label: "Industry", value: "Wind Energy" },
+      { label: "Max. Tensioning Pressure", value: "1,500 bar" },
+      { label: "Max. Load", value: "5,406 kN" },
+      { label: "Bolt Size Range", value: "M16 - M150" },
     ],
     media: [],
     catalogue: { title: "Wind Power Catalogue", meta: "8.1 MB · Updated Aug 2026", url: "#" },
@@ -567,7 +666,11 @@ export const PRODUCTS: Product[] = [
     category: "Heavy Impact Sockets",
     tagline:
       "Impact sockets that last the rigors of industrial bolting with quality backed by a lifetime warranty against any manufacturing defects.",
-    specs: [],
+    specs: [
+      { label: "Drive Sizes", value: '1/4" - 3-1/2"' },
+      { label: "Material", value: "Chrome Molybdenum, Black Oxide finish" },
+      { label: "Torque Capacity (6-Point Regular)", value: "150 - 800 ft-lbs" },
+    ],
     media: [],
     catalogue: SOCKETS_CATALOGUE,
     heroImageKey: "catImpactSockets",
@@ -579,7 +682,12 @@ export const PRODUCTS: Product[] = [
     category: "Pipe Cold Cutting and Beveling Machines",
     tagline:
       "Slit pipe sections and prepare weld edges with accuracy and safety — split-frame design and a spark-free working method ease every operation.",
-    specs: [],
+    specs: [
+      { label: "Pipe OD Range", value: '2" - 72"' },
+      { label: "Bevel Types", value: "Standard, compound, J-prep" },
+      { label: "Drive Options", value: "Pneumatic, hydraulic, electric" },
+      { label: "Mounting", value: "Split-frame" },
+    ],
     media: [],
     catalogue: IN_SITU_MACHINING_CATALOGUE,
     heroImageKey: "catPipeColdCutting",
@@ -591,7 +699,13 @@ export const PRODUCTS: Product[] = [
     category: "Flange Facing Machines",
     tagline:
       "Proper gasket grip cannot be compromised — Tritorc's reliable flange facers provide accurate surface finish, overcoming bolted-joint flange leakages with ease.",
-    specs: [],
+    specs: [
+      { label: "Max. OD", value: '118"' },
+      { label: "Mounting", value: "OD or ID mountable" },
+      { label: "Depth of Cut", value: "0.05 - 0.3 mm" },
+      { label: "Tool Post", value: "360° swivel" },
+      { label: "Drive Options", value: "Manual, pneumatic, hydraulic, CNC" },
+    ],
     media: [],
     catalogue: IN_SITU_MACHINING_CATALOGUE,
     heroImageKey: "catFlangeFacing",
@@ -615,7 +729,14 @@ export const PRODUCTS: Product[] = [
     category: "Tube Expanders",
     tagline:
       "An incorrectly rolled tube can compromise the entire heat transfer vessel — Tritorc's industry-proven tube expanders are trusted on tubes of heat exchangers, boilers, and condensers.",
-    specs: [],
+    specs: [
+      { label: "T-114 Series", value: '1-3/4" - 4-1/2" dia' },
+      { label: "TA Series", value: '7/8" - 4-1/2" dia' },
+      { label: "TAF3 Series (flaring)", value: '7/8" - 4-1/2" dia' },
+      { label: "T-1000 Series", value: '1" - 4-1/2" dia' },
+      { label: "T-3000 Series (rolling)", value: '1-1/4" - 4-1/4" dia' },
+      { label: "T-800/1200 3 & 5-Roller", value: '1/2" - 4" dia, reach to 10-3/4"' },
+    ],
     media: [],
     catalogue: TUBE_TOOL_CATALOGUE,
     heroImageKey: "catTubeExpanders",
@@ -663,7 +784,14 @@ export const PRODUCTS: Product[] = [
     category: "Single-Acting Cylinders",
     tagline:
       "Versatile and effective single-acting lifting cylinders allow restricted space access, high tonnage, and hollow cylinder applications.",
-    specs: [],
+    specs: [
+      { label: "Standard", value: "5 - 95 T, 25 - 362 mm stroke, 700 bar" },
+      { label: "Hollow", value: "5 - 100 T, 13 - 155 mm stroke, 700 bar" },
+      { label: "High Tonnage", value: "50 - 800 T, up to 300 mm stroke" },
+      { label: "Low Profile", value: "10 - 150 T, up to 80 mm stroke" },
+      { label: "Low Profile Lock Nut", value: "10 - 520 T, up to 80 mm stroke" },
+      { label: "Low Flat", value: "up to 150 T, up to 258 mm stroke" },
+    ],
     media: [],
     catalogue: null,
     heroImageKey: "catSingleActingCylinders",
@@ -674,7 +802,10 @@ export const PRODUCTS: Product[] = [
     series: "Lifting Cylinder Range",
     category: "Double-Acting Cylinders",
     tagline: "Double-acting cylinders allow controlled lifting and lowering of heavy objects and accurate positioning.",
-    specs: [],
+    specs: [
+      { label: "Hollow", value: "30 - 145 T, up to 203 mm stroke, 700 bar" },
+      { label: "High Tonnage", value: "50 - 800 T, up to 300 mm stroke, 700 bar" },
+    ],
     media: [],
     catalogue: null,
     heroImageKey: "catDoubleActingCylinders",
@@ -685,7 +816,10 @@ export const PRODUCTS: Product[] = [
     series: "Powerpack Range",
     category: "Cylinder Powerpacks and Pumps",
     tagline: "Reliable power packs and hand pumps that provide consistent pressure for critical load-lifting tools.",
-    specs: [],
+    specs: [
+      { label: "Powerpack", value: "Up to 700 bar, 1 - 2.21 L/min flow" },
+      { label: "Hand Pumps", value: "700 bar, two-speed" },
+    ],
     media: [],
     catalogue: null,
     heroImageKey: "catCylinderPowerpacks",
@@ -697,7 +831,11 @@ export const PRODUCTS: Product[] = [
     category: "Heavy Duty Hydraulic Nut Splitters",
     tagline:
       "Meticulously designed hydraulic nut splitters for effective, safe, and damage-free removal of corroded or seized nuts sizing from 11-89 mm dia.",
-    specs: [],
+    specs: [
+      { label: "Nut Size Range", value: "11 - 89 mm dia" },
+      { label: "Chisel", value: "Triangular 3-edge" },
+      { label: "Connection", value: "Rear-end" },
+    ],
     media: [],
     catalogue: BOLTING_CATALOGUE,
     heroImageKey: "catFlangeManagement",
@@ -711,7 +849,11 @@ export const PRODUCTS: Product[] = [
     category: "Light Weight Nut Splitter",
     tagline:
       "Compatible with 6-48 mm dia nuts, our angle-headed nut splitter enables effortless, safe, and damage-free removal in confined or hard-to-reach spaces.",
-    specs: [],
+    specs: [
+      { label: "Nut Size Range", value: "6 - 48 mm dia" },
+      { label: "Head Style", value: "Angle-head" },
+      { label: "Cylinder", value: "Spring-return, single-acting" },
+    ],
     media: [],
     catalogue: BOLTING_CATALOGUE,
     heroImageKey: "catFlangeManagement",
@@ -725,7 +867,11 @@ export const PRODUCTS: Product[] = [
     category: "Low Clearance Hydraulic Flange Spreader",
     tagline:
       "A force-controlled low-clearance flange spreader requiring just 2 mm insertion clearance effectively separates flanges in tight spaces without damaging seals.",
-    specs: [],
+    specs: [
+      { label: "Force", value: "5 - 10 T" },
+      { label: "Pressure", value: "700 bar" },
+      { label: "Insertion Clearance", value: "2 mm" },
+    ],
     media: [],
     catalogue: BOLTING_CATALOGUE,
     heroImageKey: "catFlangeManagement",
@@ -739,7 +885,12 @@ export const PRODUCTS: Product[] = [
     category: "Hydraulic Flange Spreader Standard Maxi Kit",
     tagline:
       "Capable of controlled flange separation and expansion up to 81 mm, our hydraulic flange spreading kit delivers reliable performance across diverse industrial applications.",
-    specs: [],
+    specs: [
+      { label: "Spread (standard)", value: "up to 61 mm" },
+      { label: "Spread (w/ stepped blocks)", value: "up to 81 mm" },
+      { label: "Gap Required", value: "6 mm" },
+      { label: "Force", value: "14 T" },
+    ],
     media: [],
     catalogue: BOLTING_CATALOGUE,
     heroImageKey: "catFlangeManagement",
@@ -753,7 +904,11 @@ export const PRODUCTS: Product[] = [
     category: "Fixed and Folding Pipe Stands",
     tagline:
       "Reliable fixed and folding pipe stands avoid the use of temporary platforms, keeping pipes stable in workshops and onsite operations.",
-    specs: [],
+    specs: [
+      { label: "Load Capacity", value: "up to 1,500 kg" },
+      { label: "Height Adjustment", value: 'up to 48"' },
+      { label: "V-Head Width", value: '12" - 24"' },
+    ],
     media: [],
     catalogue: null,
     heroImageKey: "catPipeAccessories",
@@ -765,7 +920,11 @@ export const PRODUCTS: Product[] = [
     series: "Beam Roller Range",
     category: "Heavy Duty Beam Roller",
     tagline: "Trusted tools that allow pipes to be rotated with ease while keeping them stable for welding and other operations.",
-    specs: [],
+    specs: [
+      { label: "Load Capacity", value: "1 - 10 T" },
+      { label: "Pipe Diameter", value: 'up to 60"' },
+      { label: "Mounting", value: "I-beam mounted" },
+    ],
     media: [],
     catalogue: null,
     heroImageKey: "catPipeAccessories",
@@ -777,7 +936,10 @@ export const PRODUCTS: Product[] = [
     series: "Chain Clamp Range",
     category: "Chain Clamps",
     tagline: "Keep flanges, elbow sections, and other pipe sections steady while welding reliably with our chain clamps.",
-    specs: [],
+    specs: [
+      { label: "Diameter Range", value: '2.125" - 72"' },
+      { label: "Types", value: "Single, double, scissor, spider, elbow spider" },
+    ],
     media: [],
     catalogue: null,
     heroImageKey: "catChainClamps",
@@ -816,6 +978,10 @@ export interface LibraryAsset {
   title: string;
   categoryLabel: string;
   imageKey?: ImageKey;
+  // Real Strapi media files resolve their own thumbnail/file URL directly —
+  // no curated ImageKey needed, same directImageUrl pattern used elsewhere.
+  directImageUrl?: string;
+  fileUrl?: string;
 }
 
 export const LIBRARY_MEDIA_ASSETS: LibraryAsset[] = [

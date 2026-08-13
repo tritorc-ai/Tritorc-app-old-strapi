@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SectionLabel } from "./SectionLabel";
 
@@ -20,8 +21,7 @@ export function ServicesPreviewGrid({ services }: { services: ServicePreview[] }
             className="relative flex flex-col gap-2 overflow-hidden rounded-lg p-4 shadow-[0_8px_18px_rgba(0,0,0,.18)]"
           >
             {s.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={s.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <Image src={s.imageUrl} alt="" fill sizes="50vw" className="object-cover" />
             ) : (
               <div className="absolute inset-0 bg-linear-to-br from-[#1c1c1c] to-[#2a1010]" />
             )}

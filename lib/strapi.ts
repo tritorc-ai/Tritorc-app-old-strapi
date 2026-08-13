@@ -16,6 +16,8 @@ import { IMAGE_NAMES, type ImageKey } from "./mock/images";
 import {
   CASE_STUDIES,
   CERTIFICATIONS,
+  CORE_VALUES,
+  GLOBAL_OFFICES,
   IMPACT_STATS,
   JOURNEY,
   LIBRARY_MEDIA_ASSETS,
@@ -27,6 +29,8 @@ import {
   BRAND,
   type CaseStudy,
   type Certification,
+  type CoreValue,
+  type GlobalOffice,
   type ImpactStat,
   type JourneyMilestone,
   type LibraryAsset,
@@ -45,6 +49,7 @@ export interface StrapiMediaFile {
   mime: string;
   caption: string | null;
   updatedAt: string;
+  formats?: { thumbnail?: { url: string } } | null;
 }
 
 // Mirrors the 18 real catalogues confirmed in the Strapi Media Library,
@@ -84,33 +89,75 @@ function resolveMediaUrl(url: string): string {
   return `${baseUrl}${url}`;
 }
 
-export async function getCatalogues(): Promise<StrapiMediaFile[]> {
-  const files = await strapiFetch<
-    { id: number; name: string; url: string; size: number; mime: string; caption: string | null; updatedAt: string }[]
-  >("/api/upload/files", {
-    // $containsi (case-insensitive contains) tolerates the trailing spaces /
-    // casing variance that shows up from manual admin-panel data entry —
-    // an exact $eq match missed real tagged files for this reason.
-    "filters[caption][$containsi]": "catalogue",
-    "pagination[pageSize]": "100",
-    sort: "name:asc",
+/**
+ * Fetches the entire Media Library in one request. Classification into
+ * Catalogue/Photo/Video is done by MIME type (reliable, automatic — no
+ * manual caption tagging required), so anything an editor uploads to Strapi
+ * shows up here without needing a naming convention to be followed correctly.
+ *
+ * Single request with a high pageSize rather than a real pagination loop —
+ * fine for a media library in the hundreds of files; revisit if it grows
+ * into the thousands.
+ */
+async function fetchAllMediaFiles(): Promise<StrapiMediaFile[] | null> {
+  return strapiFetch<StrapiMediaFile[]>("/api/upload/files", {
+    "pagination[pageSize]": "1000",
+    sort: "updatedAt:desc",
   });
+}
+
+export async function getCatalogues(): Promise<StrapiMediaFile[]> {
+  const files = await fetchAllMediaFiles();
 
   // Network/config failure (Strapi unreachable, missing env) -> fall back to
   // mock so the app still renders something. A successful-but-empty result
-  // (no files tagged yet) is returned as-is — that's real, current CMS state,
-  // and the Library/Catalogue screens already have an empty-state UI for it.
+  // (no PDFs uploaded yet) is returned as-is — that's real, current CMS
+  // state, and the Library/Catalogue screens already have an empty-state UI.
   if (files === null) return MOCK_CATALOGUES;
 
-  return files.map((f) => ({
-    id: f.id,
-    name: f.name,
-    url: resolveMediaUrl(f.url),
-    size: f.size,
-    mime: f.mime,
-    caption: f.caption,
-    updatedAt: f.updatedAt,
-  }));
+  return files
+    .filter((f) => f.mime === "application/pdf")
+    .map((f) => ({
+      id: f.id,
+      name: f.name,
+      url: resolveMediaUrl(f.url),
+      size: f.size,
+      mime: f.mime,
+      caption: f.caption,
+      updatedAt: f.updatedAt,
+    }));
+}
+
+// Maps the catalogue titles used in lib/mock/content.ts (Product.catalogue,
+// Company page) to their real Strapi Media Library filename, where the two
+// diverge — most already match verbatim.
+const CATALOGUE_REAL_NAMES: Record<string, string> = {
+  "Bolting & Machining Solutions Catalogue": "Bolting & Machining Solutions Cata (IND) APAC",
+  "Wind Power Catalogue": "Wind Power Cata",
+};
+
+/**
+ * Resolves a mock catalogue title (e.g. Product.catalogue.title) to its real
+ * Strapi PDF URL. Returns undefined if Strapi is unreachable or no matching
+ * file exists yet — callers keep the "#" placeholder in that case.
+ *
+ * Queries Strapi for just this one filename instead of pulling the entire
+ * (up to 1000-file) Media Library — this used to run on every single
+ * Product/Service/Company page load and was the single biggest cause of slow
+ * navigation in the app.
+ */
+export async function getCatalogueUrl(title: string): Promise<string | undefined> {
+  const targetName = (CATALOGUE_REAL_NAMES[title] ?? title).trim();
+
+  const files = await strapiFetch<StrapiMediaFile[]>("/api/upload/files", {
+    "filters[name][$containsi]": targetName,
+    "filters[mime][$eq]": "application/pdf",
+    "pagination[pageSize]": "10",
+  });
+  if (files === null) return undefined;
+
+  const match = files.find((f) => stripExtension(f.name).trim().toLowerCase() === targetName.toLowerCase());
+  return match ? resolveMediaUrl(match.url) : undefined;
 }
 
 /**
@@ -154,6 +201,14 @@ export async function getCertifications(): Promise<Certification[]> {
   return CERTIFICATIONS;
 }
 
+export async function getCoreValues(): Promise<CoreValue[]> {
+  return CORE_VALUES;
+}
+
+export async function getGlobalOffices(): Promise<GlobalOffice[]> {
+  return GLOBAL_OFFICES;
+}
+
 export async function getJourney(): Promise<JourneyMilestone[]> {
   return JOURNEY;
 }
@@ -190,19 +245,96 @@ export async function getBrand() {
   return BRAND;
 }
 
+function stripExtension(filename: string): string {
+  return filename.replace(/\.[a-z0-9]+$/i, "");
+}
+
 /**
- * The Library screen searches/filters across catalogues, photos, and videos
- * together. Catalogues come from Media Library `caption=catalogue` tagging;
- * photos/videos would use the extended `photo:*`/`video:*` tags documented
- * in the build plan once that content-prep work happens.
+ * A large chunk of the Media Library is bulk-uploaded product photos with no
+ * descriptive name at all — e.g. "product-e813e16585907f463863-e813e16585907f46",
+ * just "product-" followed by a random hex string. Those don't showcase any
+ * particular project/subject; they read as noise in the default grid. Logos
+ * and certification badges aren't project photography either. Real photos
+ * (case studies, category heroes, named products) keep readable words in
+ * their title and pass through fine.
+ */
+function isProjectPhoto(title: string): boolean {
+  const t = title.toLowerCase();
+  const withoutHash = t.replace(/-[a-f0-9]{8,}$/i, "");
+  if (/^product(-[a-f0-9]+)+$/.test(withoutHash)) return false;
+  if (/(logo|badge|-cert-|footer-)/i.test(t)) return false;
+  return true;
+}
+
+/**
+ * The Library screen searches/filters across every catalogue, photo, and
+ * video in the Media Library — classified automatically by MIME type, so
+ * anything a content editor uploads to Strapi shows up here immediately,
+ * with no manual tagging step required.
  */
 export async function getLibraryAssets(): Promise<LibraryAsset[]> {
-  const catalogues = await getCatalogues();
-  const catalogueAssets: LibraryAsset[] = catalogues.map((c) => ({
-    id: `catalogue-${c.id}`,
-    type: "Catalogue",
-    title: c.name.replace(/\.pdf$/i, ""),
-    categoryLabel: "Catalogues",
-  }));
-  return [...catalogueAssets, ...LIBRARY_MEDIA_ASSETS];
+  const files = await fetchAllMediaFiles();
+
+  // Strapi unreachable -> fall back to the full mock set so the app still
+  // renders something in dev / offline. A successful-but-empty result (no
+  // media uploaded yet) is returned as-is — that's real CMS state, and the
+  // Library screen already has an empty-state UI for it.
+  if (files === null) {
+    const catalogueAssets: LibraryAsset[] = MOCK_CATALOGUES.map((c) => ({
+      id: `catalogue-${c.id}`,
+      type: "Catalogue",
+      title: stripExtension(c.name),
+      categoryLabel: "Catalogues",
+      fileUrl: c.url,
+    }));
+    return [...catalogueAssets, ...LIBRARY_MEDIA_ASSETS];
+  }
+
+  const assets: LibraryAsset[] = [];
+  for (const f of files) {
+    const caption = f.caption?.trim();
+    if (f.mime === "application/pdf") {
+      assets.push({
+        id: `catalogue-${f.id}`,
+        type: "Catalogue",
+        title: stripExtension(f.name),
+        categoryLabel: caption || "Catalogues",
+        fileUrl: resolveMediaUrl(f.url),
+      });
+    } else if (f.mime.startsWith("video/")) {
+      assets.push({
+        id: `video-${f.id}`,
+        type: "Video",
+        title: stripExtension(f.name),
+        categoryLabel: caption || "Videos",
+        fileUrl: resolveMediaUrl(f.url),
+      });
+    } else if (f.mime.startsWith("image/")) {
+      const title = stripExtension(f.name);
+      if (!isProjectPhoto(title)) continue;
+      const thumbUrl = f.formats?.thumbnail?.url ?? f.url;
+      assets.push({
+        id: `photo-${f.id}`,
+        type: "Photo",
+        title,
+        categoryLabel: caption || "Photos",
+        directImageUrl: resolveMediaUrl(thumbUrl),
+        fileUrl: resolveMediaUrl(f.url),
+      });
+    }
+    // Anything else (docs, spreadsheets, etc.) isn't a Library asset type.
+  }
+
+  // The real Media Library has genuine duplicate uploads (the same file
+  // re-uploaded under the same display name — confirmed by manual audit, not
+  // a bug in this code). Collapse to one card per (type, title) so the
+  // default view shows only distinct assets; files is sorted updatedAt:desc,
+  // so the kept copy is always the most recently uploaded one.
+  const seen = new Set<string>();
+  return assets.filter((a) => {
+    const key = `${a.type}:${a.title.trim().toLowerCase()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }

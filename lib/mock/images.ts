@@ -74,6 +74,35 @@ export const IMAGE_NAMES = {
   svcPipeFreezing: "ppc-images-hottapping-pipe-4-png-7fff864973cb7522.png",
   svcNitrogenPurging: "ppc-images-hottapping-pipe-3-png-54218a0b38f29198.png",
   svcDryRental: "ppc-images-collage-dry-rental-gen-new-01-jpg-23d7a99e526fef90.jpg",
+
+  // Previously 5 services (Dewatering, Hydro Testing, Lube-oil Flushing,
+  // Nitrogen Helium Leak Testing, Pneumatic Testing) all shared one image
+  // (svcPipelineIntegrity) and 3 more (Emergency Repair Clamp, Hot Tapping,
+  // Online Leak Sealing) shared another (svcHotTapping). Split each out to
+  // its own real, distinct Media Library photo — no two services below
+  // point at the same file anymore.
+  svcDewatering: "ppc-images-hottapping-hottapping-img-png-40b239b5802b294c.png",
+  svcHydroTesting: "ppc-images-twp-3-webp-11e844ef3c56d022.webp",
+  svcLubeOilFlushing: "ppc-images-hottapping-hottapping-2-optimized-webp-43e4a8751299cbe1.webp",
+  svcNitrogenHeliumLeak: "ppc-images-hottapping-hot-tapping-3-webp-798148db0b105ee5.webp",
+  svcPneumaticTesting: "ppc-images-hottapping-hot-tapping-4-webp-b33c536ec6f99718.webp",
+  svcEmergencyRepairClamp: "ppc-images-hottapping-fittings-optimized-webp-8cb84bebd77a162d.webp",
+  svcOnlineLeakSealing: "ppc-images-hottapping-gcc-home-webp-e71633422678257a.webp",
+
+  // Extra in-use gallery shots for Hot Tapping & Line Stopping — real photos
+  // from the Media Library not used as any hero image elsewhere.
+  hotTappingGallery1: "ppc-images-hottapping-hot-tapping-2-webp-0d869027570b2fd9.webp",
+  hotTappingGallery2: "ppc-images-hottapping-hot-tapping-optimized-webp-fe6cce52ba1a84ae.webp",
+  hotTappingGallery3: "ppc-images-hottapping-hot-tapping-1-optimized-webp-5f4c18c379362e2c.webp",
+  hotTappingGallery4: "ppc-images-hottapping-fitting-2-optimized-webp-89054edb37cab7c9.webp",
+  hotTappingGallery5: "ppc-images-hottapping-cutters-final-jpg-d8367cb2ed36bac9.jpg",
+  // Real ONGC project photo — ties to the ONGC NQP case study on the home page.
+  hotTappingOngc: "ppc-images-collage-hot-tapping-ongc-002-jpeg-86c72e66f2637943.jpeg",
+  // Second real photo for Dry Rental, alongside the existing collage shot.
+  dryRentalEquipment: "about-page-equipment-rentals-c8e3328c55af3b47.jpg",
+  // Was "productSpecDiagram" — a torque-wrench spec DIAGRAM, not a
+  // calibration photo at all (see the note on that key above).
+  svcCalibration: "about-page-services-76263159dc124c72.jpg",
 } as const;
 
 export type ImageKey = keyof typeof IMAGE_NAMES;

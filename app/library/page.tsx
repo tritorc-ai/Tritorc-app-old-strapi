@@ -6,7 +6,7 @@ export default async function LibraryPage() {
   const [assets, images] = await Promise.all([getLibraryAssets(), getImageUrls()]);
   const enriched = assets.map((a) => ({
     ...a,
-    imageUrl: a.imageKey ? images[a.imageKey] : undefined,
+    imageUrl: a.directImageUrl ?? (a.imageKey ? images[a.imageKey] : undefined),
   }));
 
   return (

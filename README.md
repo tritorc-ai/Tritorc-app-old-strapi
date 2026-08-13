@@ -12,8 +12,7 @@ Built with [Next.js](https://nextjs.org), [Tailwind CSS](https://tailwindcss.com
 
 ## ✨ Features
 
-- 🏠 **Home** — hero, impact stats, featured products, and case studies
-- 🧰 **Tool Selector** — guided flow to find the right torque wrench or bolt tensioner
+- 🏠 **Home** — hero, client testimonials, impact stats, featured products, and case studies
 - 📦 **Products & Services** — browsable catalogues with detail pages
 - 🏢 **Company** — journey timeline and certifications
 - 📚 **Library** — media and resource browser
@@ -48,8 +47,7 @@ app/                  Routes (App Router)
 ├── company/          Company & journey page
 ├── library/          Media library
 ├── products/         Product catalogue + detail pages
-├── services/         Services catalogue + detail pages
-└── tool-selector/     Guided tool selection flow
+└── services/         Services catalogue + detail pages
 
 components/
 ├── app/              Feature components (Hero, BottomNav, carousels, etc.)
@@ -57,7 +55,6 @@ components/
 
 lib/
 ├── mock/             Placeholder content & images
-├── toolSelector/     Tool selection logic & spec tables
 └── strapi.ts         CMS data layer (Strapi + mock fallback)
 ```
 

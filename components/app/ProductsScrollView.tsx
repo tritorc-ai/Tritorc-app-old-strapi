@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import type { Product } from "@/lib/mock/content";
 
 export interface ScrollSection {
@@ -131,21 +131,6 @@ export function ProductsScrollView({ sections }: { sections: ScrollSection[] }) 
         })}
       </div>
 
-      <Link
-        href="/tool-selector"
-        className="mb-5.5 flex items-center justify-between gap-2.5 rounded-lg bg-linear-to-br from-brand-red to-brand-red-bright px-4 py-3.5 shadow-[0_8px_18px_rgba(214,49,47,.3)]"
-      >
-        <div>
-          <div className="text-[13.5px] font-bold leading-snug text-white">
-            Not sure which tool you need?
-          </div>
-          <div className="mt-0.5 text-[11.5px] leading-snug text-white/85">
-            Answer a few questions to get a recommendation
-          </div>
-        </div>
-        <ArrowRight size={18} className="shrink-0 text-white" />
-      </Link>
-
       {sections.map((section, i) => (
         <div
           key={section.name}
@@ -173,11 +158,12 @@ export function ProductsScrollView({ sections }: { sections: ScrollSection[] }) 
                   >
                     <div className="relative aspect-square w-full overflow-hidden bg-brand-surface">
                       {p.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={p.imageUrl}
                           alt=""
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="50vw"
+                          className="object-cover"
                           style={{
                             objectPosition: variant.objectPosition,
                             transform: `scale(${variant.scale})`,

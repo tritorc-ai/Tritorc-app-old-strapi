@@ -9,18 +9,19 @@ import {
   getProducts,
   getServices,
   getServiceSections,
+  getTestimonials,
 } from "@/lib/strapi";
 import { Hero } from "@/components/app/Hero";
-import { FindMyToolCta } from "@/components/app/FindMyToolCta";
 import { ImpactStatStrip } from "@/components/app/ImpactStatStrip";
 import { CaseStudyCarousel } from "@/components/app/CaseStudyCarousel";
 import { CertificationsSection } from "@/components/app/CertificationsSection";
 import { JourneyTimeline } from "@/components/app/JourneyTimeline";
 import { ServicesPreviewGrid } from "@/components/app/ServicesPreviewGrid";
 import { FeaturedProductsRow } from "@/components/app/FeaturedProductsRow";
+import { TestimonialsSection } from "@/components/app/TestimonialsSection";
 
 export default async function HomePage() {
-  const [brand, stats, caseStudies, certifications, journey, services, sections, products, images] =
+  const [brand, stats, caseStudies, certifications, journey, services, sections, products, testimonials, images] =
     await Promise.all([
       getBrand(),
       getImpactStats(),
@@ -30,6 +31,7 @@ export default async function HomePage() {
       getServices(),
       getServiceSections(),
       getProducts(),
+      getTestimonials(),
       getImageUrls(),
     ]);
 
@@ -73,10 +75,13 @@ export default async function HomePage() {
 
       <div className="px-5">
         <Hero quote={brand.quote} since={brand.since} imageUrl={images.homeHero} />
-        <FindMyToolCta />
+        <TestimonialsSection testimonials={testimonials} images={images} />
         <ImpactStatStrip stats={stats} imageUrl={images.impactBg} />
         <CaseStudyCarousel
-          caseStudies={caseStudies.map((cs) => ({ ...cs, imageUrl: images[cs.imageKey] }))}
+          caseStudies={caseStudies.map((cs) => ({
+            ...cs,
+            imageUrl: cs.directImageUrl ?? (cs.imageKey ? images[cs.imageKey] : undefined),
+          }))}
         />
         <CertificationsSection
           certifications={certifications.map((c) => ({

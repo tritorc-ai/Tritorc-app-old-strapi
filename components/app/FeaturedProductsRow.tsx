@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/lib/mock/content";
 import { SectionLabel } from "./SectionLabel";
@@ -22,8 +23,7 @@ export function FeaturedProductsRow({ products }: { products: ProductWithImage[]
           >
             <div className="relative h-23 overflow-hidden">
               {p.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.imageUrl} alt="" className="h-full w-full object-cover" />
+                <Image src={p.imageUrl} alt="" fill sizes="152px" className="object-cover" />
               ) : (
                 <div className="h-full w-full bg-[repeating-linear-gradient(135deg,#eef0f2_0px,#eef0f2_9px,#e3e7ea_9px,#e3e7ea_18px)]" />
               )}

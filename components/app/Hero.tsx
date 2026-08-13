@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export function Hero({
   quote,
   since,
@@ -10,8 +12,7 @@ export function Hero({
   return (
     <div className="relative mb-8 h-[300px] overflow-hidden bg-[repeating-linear-gradient(115deg,#4a4f55_0px,#4a4f55_16px,#3d4247_16px,#3d4247_32px)]">
       {imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <Image src={imageUrl} alt="" fill priority className="object-cover" sizes="100vw" />
       ) : (
         <div className="absolute right-4 top-3 z-[2] rounded-sm bg-black/35 px-1.5 py-0.5 font-mono text-[9px] font-medium text-white/50">
           PHOTO: EQUIPMENT IN THE FIELD

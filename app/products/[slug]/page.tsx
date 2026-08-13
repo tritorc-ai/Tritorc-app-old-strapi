@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getImageUrls, getProduct } from "@/lib/strapi";
+import { getCatalogueUrl, getImageUrls, getProduct } from "@/lib/strapi";
 import { ProductDetailView } from "@/components/app/ProductDetailView";
 import type { ImageKey } from "@/lib/mock/images";
 import type { ProductMediaAsset } from "@/lib/mock/content";
@@ -26,8 +26,13 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
     })
     .filter((m): m is ProductMediaAsset => m !== null);
 
-  const productWithMedia =
-    extraMedia.length > 0 ? { ...product, media: [...product.media, ...extraMedia] } : product;
+  const catalogueUrl = product.catalogue ? await getCatalogueUrl(product.catalogue.title) : undefined;
+  const productWithMedia = {
+    ...product,
+    media: extraMedia.length > 0 ? [...product.media, ...extraMedia] : product.media,
+    catalogue:
+      product.catalogue && catalogueUrl ? { ...product.catalogue, url: catalogueUrl } : product.catalogue,
+  };
 
   return (
     <ProductDetailView

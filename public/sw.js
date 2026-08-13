@@ -1,5 +1,5 @@
 // Minimal app-shell service worker. Scope: installability only.
-// Deliberately does NOT cache page data (catalogues, product/tool-selector
+// Deliberately does NOT cache page data (catalogues, product/service
 // content) — those must always come from the network per the "always pull
 // latest from Strapi" requirement. Only static, rarely-changing shell assets
 // are cached so the app can be added to the home screen.

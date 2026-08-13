@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Certification } from "@/lib/mock/content";
 import { SectionLabel } from "./SectionLabel";
 
@@ -6,9 +7,8 @@ type CertificationWithImage = Certification & { imageUrl?: string };
 function Badge({ code, imageUrl }: { code: string; imageUrl?: string }) {
   if (imageUrl) {
     return (
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white p-1.5">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageUrl} alt={code} className="h-full w-full object-contain" />
+      <div className="relative h-12 w-12 shrink-0 rounded-full border border-black/8 bg-white">
+        <Image src={imageUrl} alt={code} fill sizes="48px" className="object-contain p-1.5" />
       </div>
     );
   }

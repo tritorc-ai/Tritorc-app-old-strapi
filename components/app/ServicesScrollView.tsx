@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { Service } from "@/lib/mock/content";
 
@@ -157,11 +158,12 @@ export function ServicesScrollView({ sections }: { sections: ServiceScrollSectio
                   >
                     <div className="relative aspect-square w-full overflow-hidden bg-brand-surface">
                       {s.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={s.imageUrl}
                           alt=""
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="50vw"
+                          className="object-cover"
                           style={{
                             objectPosition: variant.objectPosition,
                             transform: `scale(${variant.scale})`,

@@ -1,16 +1,14 @@
+import Image from "next/image";
 import type { CaseStudy } from "@/lib/mock/content";
 import { SectionLabel } from "./SectionLabel";
 
 type CaseStudyWithImage = CaseStudy & { imageUrl?: string };
 
-function PhotoBg({ imageUrl, className }: { imageUrl?: string; className: string }) {
+function PhotoBg({ imageUrl, sizes }: { imageUrl?: string; sizes: string }) {
   return imageUrl ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={imageUrl} alt="" className={`${className} object-cover`} />
+    <Image src={imageUrl} alt="" fill sizes={sizes} className="object-cover" />
   ) : (
-    <div
-      className={`${className} bg-[repeating-linear-gradient(115deg,#4a4f55_0px,#4a4f55_16px,#3d4247_16px,#3d4247_32px)]`}
-    />
+    <div className="absolute inset-0 h-full w-full bg-[repeating-linear-gradient(115deg,#4a4f55_0px,#4a4f55_16px,#3d4247_16px,#3d4247_32px)]" />
   );
 }
 
@@ -25,7 +23,7 @@ export function CaseStudyCarousel({ caseStudies }: { caseStudies: CaseStudyWithI
 
       <div className="mb-4 overflow-hidden rounded-[10px] border border-black/6 bg-white shadow-[0_1px_2px_rgba(0,0,0,.03),0_12px_26px_rgba(0,0,0,.1)]">
         <div className="relative h-[170px]">
-          <PhotoBg imageUrl={featured.imageUrl} className="absolute inset-0 h-full w-full" />
+          <PhotoBg imageUrl={featured.imageUrl} sizes="100vw" />
           <div className="absolute inset-0 [background-image:linear-gradient(0deg,rgba(10,10,10,.85)_0%,rgba(10,10,10,.1)_65%)]" />
           <div className="absolute left-3 top-2.5 rounded-sm bg-black/40 px-1.5 py-0.5 font-mono text-[9px] font-bold tracking-wider text-brand-red-bright">
             FEATURED
@@ -50,7 +48,7 @@ export function CaseStudyCarousel({ caseStudies }: { caseStudies: CaseStudyWithI
             className="w-[180px] shrink-0 overflow-hidden rounded-[10px] border border-black/6 bg-white shadow-[0_1px_2px_rgba(0,0,0,.03),0_6px_14px_rgba(0,0,0,.05)]"
           >
             <div className="relative h-24">
-              <PhotoBg imageUrl={cs.imageUrl} className="absolute inset-0 h-full w-full" />
+              <PhotoBg imageUrl={cs.imageUrl} sizes="180px" />
               <div className="absolute inset-0 [background-image:linear-gradient(0deg,rgba(10,10,10,.8)_0%,rgba(10,10,10,.1)_65%)]" />
               <div className="absolute inset-x-2.5 bottom-2 text-xs font-bold leading-tight text-white">
                 {cs.name}

@@ -26,10 +26,18 @@ function getHeaders(): Record<string, string> | null {
  * timeout, missing config, non-2xx) — callers are expected to fall back to
  * mock/static content rather than crash the page, matching the resilience
  * pattern the official site uses.
+ *
+ * Cached for `revalidateSeconds` (Next.js Data Cache) instead of "no-store" —
+ * every navigation was re-fetching from Strapi from scratch, which was the
+ * main cause of slow page-to-page navigation. Content still shows up within
+ * that window with no rebuild needed, just not instantaneously — a
+ * reasonable trade for a marketing site whose content doesn't change
+ * second-to-second. Pass 0 to opt back into always-fresh for a specific call.
  */
 export async function strapiFetch<T>(
   path: string,
-  params?: Record<string, string>
+  params?: Record<string, string>,
+  revalidateSeconds = 30
 ): Promise<T | null> {
   const baseUrl = getBaseUrl();
   const headers = getHeaders();
@@ -49,7 +57,9 @@ export async function strapiFetch<T>(
     const res = await fetch(url.toString(), {
       headers,
       signal: controller.signal,
-      cache: "no-store",
+      ...(revalidateSeconds > 0
+        ? { next: { revalidate: revalidateSeconds } }
+        : { cache: "no-store" as const }),
     });
     if (!res.ok) {
       console.warn(`[strapi] ${path} -> HTTP ${res.status}`);

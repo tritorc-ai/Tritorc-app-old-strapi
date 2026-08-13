@@ -1,8 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import type { LibraryAsset } from "@/lib/mock/content";
 import { cn } from "@/lib/utils";
+import { PdfPreviewModal } from "./PdfPreviewModal";
+import { PdfThumbnail } from "./PdfThumbnail";
 
 const TYPES = ["All", "Catalogue", "Video", "Photo"] as const;
 type TypeFilter = (typeof TYPES)[number];
@@ -19,6 +22,7 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("All");
   const [category, setCategory] = useState("All categories");
+  const [previewAsset, setPreviewAsset] = useState<LibraryAssetWithImage | null>(null);
 
   const categories = useMemo(
     () => ["All categories", ...Array.from(new Set(assets.map((a) => a.categoryLabel)))],
@@ -87,15 +91,23 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
       <div className="mt-4 grid grid-cols-2 gap-2.5">
         {results.map((a) => {
           const color = TYPE_COLORS[a.type];
+          const isPdf = a.type === "Catalogue" && !!a.fileUrl && a.fileUrl !== "#";
           return (
-            <div
+            <button
               key={a.id}
-              className="flex flex-col overflow-hidden rounded-lg border border-black/6 bg-white shadow-[0_1px_2px_rgba(0,0,0,.03),0_6px_14px_rgba(0,0,0,.05)]"
+              type="button"
+              onClick={() => isPdf && setPreviewAsset(a)}
+              disabled={!isPdf}
+              className={cn(
+                "flex flex-col overflow-hidden rounded-lg border border-black/6 bg-white text-left shadow-[0_1px_2px_rgba(0,0,0,.03),0_6px_14px_rgba(0,0,0,.05)]",
+                !isPdf && "cursor-default"
+              )}
             >
               <div className="relative h-24 overflow-hidden">
                 {a.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={a.imageUrl} alt="" className="h-full w-full object-cover" />
+                  <Image src={a.imageUrl} alt="" fill sizes="50vw" className="object-cover" />
+                ) : a.type === "Catalogue" ? (
+                  <PdfThumbnail title={a.title} />
                 ) : (
                   <div className="h-full w-full bg-[repeating-linear-gradient(135deg,#eef0f2_0px,#eef0f2_9px,#e3e7ea_9px,#e3e7ea_18px)]" />
                 )}
@@ -106,6 +118,11 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
                 >
                   {a.type}
                 </div>
+                {isPdf && (
+                  <div className="absolute bottom-1.5 right-1.5 rounded-[2px] bg-black/55 px-1.5 py-0.5 text-[9px] font-semibold text-white">
+                    Preview
+                  </div>
+                )}
               </div>
               <div className="px-2.5 py-2.25">
                 <div className="text-[11.5px] font-semibold leading-tight text-brand-dark">
@@ -115,10 +132,18 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
                   {a.categoryLabel}
                 </div>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {previewAsset?.fileUrl && (
+        <PdfPreviewModal
+          title={previewAsset.title}
+          url={previewAsset.fileUrl}
+          onClose={() => setPreviewAsset(null)}
+        />
+      )}
 
       {results.length === 0 && (
         <div className="py-10 text-center text-[13px] text-brand-text-secondary">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { ImpactStat } from "@/lib/mock/content";
 import { SectionLabel } from "./SectionLabel";
 
@@ -12,8 +13,7 @@ export function ImpactStatStrip({
     <div className="relative -mx-5 mb-7 overflow-hidden bg-brand-dark px-5 py-7">
       {imageUrl ? (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <Image src={imageUrl} alt="" fill sizes="100vw" className="object-cover" />
           <div className="absolute inset-0 bg-brand-dark/85" />
         </>
       ) : (
