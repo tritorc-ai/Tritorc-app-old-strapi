@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import { Play } from "lucide-react";
 import type { LibraryAsset } from "@/lib/mock/content";
 import { cn } from "@/lib/utils";
-import { PdfPreviewModal } from "./PdfPreviewModal";
+import { MediaPreviewModal } from "./MediaPreviewModal";
 import { PdfThumbnail } from "./PdfThumbnail";
 
 const TYPES = ["All", "Catalogue", "Video", "Photo"] as const;
@@ -22,7 +23,7 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("All");
   const [category, setCategory] = useState("All categories");
-  const [previewAsset, setPreviewAsset] = useState<LibraryAssetWithImage | null>(null);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   const categories = useMemo(
     () => ["All categories", ...Array.from(new Set(assets.map((a) => a.categoryLabel)))],
@@ -37,6 +38,15 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
       return true;
     });
   }, [assets, search, typeFilter, category]);
+
+  function canPreviewAsset(a: LibraryAssetWithImage) {
+    return a.type === "Catalogue" ? !!a.fileUrl && a.fileUrl !== "#" : !!(a.fileUrl || a.imageUrl);
+  }
+
+  // Swiping/arrow-keying through the preview modal moves within this same
+  // filtered, previewable subset — not the full `results` list, so it never
+  // lands on a disabled tile with nothing to show.
+  const previewableResults = useMemo(() => results.filter(canPreviewAsset), [results]);
 
   return (
     <div className="px-5 pb-6">
@@ -91,16 +101,16 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
       <div className="mt-4 grid grid-cols-2 gap-2.5">
         {results.map((a) => {
           const color = TYPE_COLORS[a.type];
-          const isPdf = a.type === "Catalogue" && !!a.fileUrl && a.fileUrl !== "#";
+          const canPreview = canPreviewAsset(a);
           return (
             <button
               key={a.id}
               type="button"
-              onClick={() => isPdf && setPreviewAsset(a)}
-              disabled={!isPdf}
+              onClick={() => canPreview && setPreviewIndex(previewableResults.indexOf(a))}
+              disabled={!canPreview}
               className={cn(
                 "flex flex-col overflow-hidden rounded-lg border border-black/6 bg-white text-left shadow-[0_1px_2px_rgba(0,0,0,.03),0_6px_14px_rgba(0,0,0,.05)]",
-                !isPdf && "cursor-default"
+                !canPreview && "cursor-default"
               )}
             >
               <div className="relative h-24 overflow-hidden">
@@ -111,6 +121,13 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
                 ) : (
                   <div className="h-full w-full bg-[repeating-linear-gradient(135deg,#eef0f2_0px,#eef0f2_9px,#e3e7ea_9px,#e3e7ea_18px)]" />
                 )}
+                {a.type === "Video" && canPreview && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/85">
+                      <Play size={13} className="translate-x-0.5 text-brand-dark" fill="currentColor" />
+                    </div>
+                  </div>
+                )}
                 <div className="absolute inset-x-0 bottom-0 h-0.5" style={{ background: color }} />
                 <div
                   className="absolute left-1.5 top-1.5 rounded-[2px] px-1.5 py-0.5 font-mono text-[9px] font-bold text-white"
@@ -118,7 +135,7 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
                 >
                   {a.type}
                 </div>
-                {isPdf && (
+                {canPreview && a.type !== "Video" && (
                   <div className="absolute bottom-1.5 right-1.5 rounded-[2px] bg-black/55 px-1.5 py-0.5 text-[9px] font-semibold text-white">
                     Preview
                   </div>
@@ -137,11 +154,11 @@ export function LibraryView({ assets }: { assets: LibraryAssetWithImage[] }) {
         })}
       </div>
 
-      {previewAsset?.fileUrl && (
-        <PdfPreviewModal
-          title={previewAsset.title}
-          url={previewAsset.fileUrl}
-          onClose={() => setPreviewAsset(null)}
+      {previewIndex !== null && (
+        <MediaPreviewModal
+          items={previewableResults}
+          initialIndex={previewIndex}
+          onClose={() => setPreviewIndex(null)}
         />
       )}
 
