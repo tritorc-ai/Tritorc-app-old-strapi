@@ -44,7 +44,10 @@ export function InstallPrompt() {
   }
 
   return (
-    <div className="sticky bottom-[64px] z-20 mx-3 mb-2 flex items-center gap-2.5 rounded-lg bg-brand-dark px-3.5 py-2.5 shadow-[0_10px_24px_rgba(0,0,0,.25)]">
+    <div
+      className="sticky z-20 mx-3 mb-2 flex items-center gap-2.5 rounded-lg bg-brand-dark px-3.5 py-2.5 shadow-[0_10px_24px_rgba(0,0,0,.25)]"
+      style={{ bottom: "calc(64px + env(safe-area-inset-bottom, 0px))" }}
+    >
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
         <Download size={15} />
       </div>

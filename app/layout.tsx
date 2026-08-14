@@ -34,6 +34,12 @@ export const viewport: Viewport = {
   themeColor: "#171717",
   width: "device-width",
   initialScale: 1,
+  // Lets content draw under the notch/status bar on iOS so env(safe-area-
+  // inset-*) reports the device's real inset instead of always being 0 —
+  // without this, "black-translucent" status bar + a hardcoded top padding
+  // (see pt-safe-header in globals.css) either double up on notched devices
+  // or leave a padding-shaped gap with nothing to clear on everything else.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

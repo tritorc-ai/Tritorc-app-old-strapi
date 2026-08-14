@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/app/Skeleton";
 
 export default function LibraryLoading() {
   return (
-    <div className="pt-[54px]">
+    <div className="pt-safe-header">
       <Skeleton className="mx-5 mb-1.5 h-6 w-24" />
       <Skeleton className="mx-5 mb-4 h-3.5 w-56" />
       <div className="px-5 pb-6">

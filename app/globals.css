@@ -146,3 +146,16 @@
     @apply font-sans;
   }
 }
+
+/* Real device safe-area clearance instead of a hardcoded guess. In a normal
+ * browser tab env(safe-area-inset-*) is 0 (the browser's own chrome already
+ * reserves that space), so these collapse to just the base spacing — no more
+ * stacked "browser UI + fixed 54px" gap. In an installed PWA on a notched
+ * device they pick up the device's real inset automatically. */
+@utility pt-safe-header {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
+}
+
+@utility pb-safe-nav {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}

@@ -18,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav className="sticky bottom-0 z-20 border-t border-black/8 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <div className="mx-auto flex max-w-md items-stretch justify-between px-2 py-2 sm:max-w-none sm:justify-center sm:gap-16">
+      <div className="mx-auto flex max-w-md items-stretch justify-between px-2 pt-2 pb-safe-nav sm:max-w-none sm:justify-center sm:gap-16">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (

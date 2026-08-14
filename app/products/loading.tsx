@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/app/Skeleton";
 
 export default function ProductsLoading() {
   return (
-    <div className="px-5 pb-6 pt-[54px]">
+    <div className="px-5 pb-6 pt-safe-header">
       <Skeleton className="mb-1.5 h-6 w-32" />
       <Skeleton className="mb-4 h-3.5 w-52" />
       <Skeleton className="mb-3 h-4 w-40" />

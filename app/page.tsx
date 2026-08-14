@@ -53,7 +53,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-brand-surface px-5 pb-4 pt-[54px]">
+      <div className="sticky top-0 z-10 flex items-center justify-between bg-brand-surface px-5 pb-4 pt-safe-header">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-brand-red text-[15px] font-extrabold leading-none text-white">
             T

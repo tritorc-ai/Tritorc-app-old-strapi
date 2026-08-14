@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/app/Skeleton";
 export default function ProductDetailLoading() {
   return (
     <div>
-      <div className="flex items-center gap-2.5 px-5 pb-2.5 pt-[54px]">
+      <div className="flex items-center gap-2.5 px-5 pb-2.5 pt-safe-header">
         <Skeleton className="h-5 w-5 rounded" />
         <Skeleton className="h-3.5 w-20" />
       </div>

@@ -51,7 +51,7 @@ export function ServiceDetailView({
 
   return (
     <div>
-      <div className="sticky top-0 z-10 flex items-center gap-2.5 bg-brand-surface px-5 pb-2.5 pt-[54px]">
+      <div className="sticky top-0 z-10 flex items-center gap-2.5 bg-brand-surface px-5 pb-2.5 pt-safe-header">
         <Link href="/services" className="text-brand-dark">
           <ArrowLeft size={20} />
         </Link>

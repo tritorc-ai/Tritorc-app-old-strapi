@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/app/Skeleton";
 export default function HomeLoading() {
   return (
     <div>
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-brand-surface px-5 pb-4 pt-[54px]">
+      <div className="sticky top-0 z-10 flex items-center justify-between bg-brand-surface px-5 pb-4 pt-safe-header">
         <div className="flex items-center gap-2">
           <Skeleton className="h-7 w-7 rounded-md" />
           <Skeleton className="h-5 w-24" />
