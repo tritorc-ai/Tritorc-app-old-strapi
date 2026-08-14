@@ -1,10 +1,14 @@
-import { getImageUrls, getProducts } from "@/lib/strapi";
+import { getImageUrls, getProducts, getThumbnailMap } from "@/lib/strapi";
 import { PRODUCT_CATEGORIES, PRODUCT_SECTIONS } from "@/lib/mock/content";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ProductsScrollView } from "@/components/app/ProductsScrollView";
 
 export default async function ProductsPage() {
-  const [products, images] = await Promise.all([getProducts(), getImageUrls()]);
+  const [products, images, thumbnails] = await Promise.all([
+    getProducts(),
+    getImageUrls(),
+    getThumbnailMap("product"),
+  ]);
   const categoryImageByName = new Map(
     PRODUCT_CATEGORIES.map((c) => [c.name, images[c.imageKey]])
   );
@@ -17,6 +21,7 @@ export default async function ProductsPage() {
       .map((p) => ({
         ...p,
         imageUrl:
+          thumbnails[p.slug] ??
           p.directImageUrl ??
           (p.heroImageKey ? images[p.heroImageKey] : categoryImageByName.get(p.category)),
       })),

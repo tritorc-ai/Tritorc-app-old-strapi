@@ -73,7 +73,13 @@ Product catalogues are wired to a live [Strapi](https://strapi.io) CMS instance.
 
 ## ☁️ Deployment
 
-The easiest way to deploy this app is via [Vercel](https://vercel.com/new), from the creators of Next.js. See the [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying) for other options.
+Deploy via [Vercel](https://vercel.com/new) — zero extra config needed beyond environment variables:
+
+1. Import this repo in Vercel.
+2. Add the env vars from [`.env.example`](.env.example) under Project Settings → Environment Variables (`STRAPI_API_URL`, `STRAPI_API_READ_TOKEN`). Missing vars don't break the build — the app falls back to mock content.
+3. Optionally set `NEXT_PUBLIC_SITE_URL` once a custom domain is attached (defaults to Vercel's own preview/production URL otherwise).
+
+ISR (`revalidate: 30`) and `next/image` optimization both work out of the box on Vercel — no extra setup. See the [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying) for other hosts.
 
 ---
 

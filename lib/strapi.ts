@@ -160,6 +160,71 @@ export async function getCatalogueUrl(title: string): Promise<string | undefined
   return match ? resolveMediaUrl(match.url) : undefined;
 }
 
+export interface CaptionMediaAsset {
+  url: string;
+  /** The part of the caption after the prefix, e.g. "hero", "gallery:in-use". */
+  suffix: string;
+}
+
+/**
+ * Resolves media by caption convention instead of a hardcoded filename map —
+ * this is what lets new Product/Service photos show up correctly without a
+ * code change or redeploy. Whoever uploads to Strapi tags a file's caption
+ * as `product:<slug>:hero`, `product:<slug>:thumbnail`,
+ * `product:<slug>:gallery:product`, `product:<slug>:gallery:in-use` (or the
+ * `service:<slug>:...` equivalents, with `overview` instead of `product` for
+ * the gallery) — this queries Strapi for everything starting with
+ * `<entityType>:<slug>:`, live, each time the page loads.
+ *
+ * Returns [] if Strapi is unreachable or nothing is tagged yet — callers
+ * fall back to the existing curated `lib/mock/images.ts` lookups in that
+ * case, so nothing already working breaks while this convention is adopted.
+ */
+export async function getMediaByCaption(prefix: string): Promise<CaptionMediaAsset[]> {
+  const files = await strapiFetch<StrapiMediaFile[]>("/api/upload/files", {
+    "filters[caption][$containsi]": prefix,
+    "pagination[pageSize]": "50",
+  });
+  if (files === null) return [];
+
+  const normalizedPrefix = prefix.trim().toLowerCase();
+  return files
+    .map((f) => {
+      const caption = f.caption?.trim().toLowerCase() ?? "";
+      if (!caption.startsWith(normalizedPrefix)) return null;
+      const suffix = caption.slice(normalizedPrefix.length).replace(/^:/, "");
+      return { url: resolveMediaUrl(f.url), suffix };
+    })
+    .filter((a): a is CaptionMediaAsset => a !== null);
+}
+
+/**
+ * Bulk version of the thumbnail half of the caption convention, for listing
+ * pages (Products/Services grids) — one query for every `<entityType>:<slug>:thumbnail`
+ * caption instead of one network call per product/service. Returns a map of
+ * slug -> resolved URL; callers fall back to the existing curated image for
+ * any slug missing from the map.
+ */
+export async function getThumbnailMap(
+  entityType: "product" | "service"
+): Promise<Record<string, string>> {
+  const files = await strapiFetch<StrapiMediaFile[]>("/api/upload/files", {
+    "filters[caption][$containsi]": ":thumbnail",
+    "pagination[pageSize]": "100",
+  });
+  if (files === null) return {};
+
+  const prefix = `${entityType}:`;
+  const map: Record<string, string> = {};
+  for (const f of files) {
+    const caption = f.caption?.trim().toLowerCase() ?? "";
+    if (!caption.startsWith(prefix) || !caption.endsWith(":thumbnail")) continue;
+    const slug = caption.slice(prefix.length, -":thumbnail".length);
+    if (slug) map[slug] = resolveMediaUrl(f.url);
+  }
+  return map;
+}
+
 /**
  * Resolves a curated set of real Media Library images (matched by filename,
  * see lib/mock/images.ts) to their live S3 URLs in one bulk request. Returns

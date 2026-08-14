@@ -1,9 +1,21 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/app/BottomNav";
+import { InstallPrompt } from "@/components/app/InstallPrompt";
 import { ServiceWorkerRegister } from "@/components/app/ServiceWorkerRegister";
 
+// Resolves relative URLs in metadata (OG images, canonical links) against the
+// real deployment origin. Vercel sets VERCEL_PROJECT_PRODUCTION_URL/VERCEL_URL
+// automatically per-environment; NEXT_PUBLIC_SITE_URL overrides both once a
+// custom domain is attached.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Tritorc",
   description:
     "Turnkey industrial bolting, on-site machining & pipeline integrity solutions.",
@@ -30,6 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full bg-brand-surface font-sans text-foreground">
         <div className="mx-auto flex min-h-dvh max-w-md flex-col bg-white shadow-[0_0_60px_rgba(0,0,0,0.06)] sm:max-w-none sm:shadow-none">
           <div className="flex-1">{children}</div>
+          <InstallPrompt />
           <BottomNav />
         </div>
         <ServiceWorkerRegister />

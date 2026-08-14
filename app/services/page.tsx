@@ -1,13 +1,20 @@
-import { getImageUrls, getServiceCategories, getServiceSections, getServices } from "@/lib/strapi";
+import {
+  getImageUrls,
+  getServiceCategories,
+  getServiceSections,
+  getServices,
+  getThumbnailMap,
+} from "@/lib/strapi";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ServicesScrollView } from "@/components/app/ServicesScrollView";
 
 export default async function ServicesPage() {
-  const [services, categories, sections, images] = await Promise.all([
+  const [services, categories, sections, images, thumbnails] = await Promise.all([
     getServices(),
     getServiceCategories(),
     getServiceSections(),
     getImageUrls(),
+    getThumbnailMap("service"),
   ]);
   const categoryImageByName = new Map(
     categories.map((c) => [c.name, c.directImageUrl ?? (c.imageKey ? images[c.imageKey] : undefined)])
@@ -22,6 +29,7 @@ export default async function ServicesPage() {
         .map((s) => ({
           ...s,
           imageUrl:
+            thumbnails[s.slug] ??
             s.directImageUrl ??
             (s.imageKey ? images[s.imageKey] : undefined) ??
             categoryImageByName.get(s.category),
