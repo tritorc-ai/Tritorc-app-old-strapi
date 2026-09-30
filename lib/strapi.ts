@@ -13,6 +13,7 @@ import "server-only";
 
 import { strapiFetch } from "./strapiClient";
 import { IMAGE_NAMES, type ImageKey } from "./mock/images";
+import { VIDEO_NAMES, type VideoKey } from "./mock/videos";
 import {
   CASE_STUDIES,
   CERTIFICATIONS,
@@ -248,6 +249,33 @@ export async function getImageUrls(): Promise<Partial<Record<ImageKey, string>>>
   const urlByName = new Map(files.map((f) => [f.name, resolveMediaUrl(f.url)]));
   const result: Partial<Record<ImageKey, string>> = {};
   for (const [key, name] of Object.entries(IMAGE_NAMES) as [ImageKey, string][]) {
+    const url = urlByName.get(name);
+    if (url) result[key] = url;
+  }
+  return result;
+}
+
+/**
+ * Video counterpart of getImageUrls() — resolves the curated VIDEO_NAMES map
+ * (lib/mock/videos.ts) to live URLs in one bulk request. Returns an empty
+ * map on failure, same fallback contract as getImageUrls().
+ */
+export async function getVideoUrls(): Promise<Partial<Record<VideoKey, string>>> {
+  const names = Object.values(VIDEO_NAMES);
+  const params: Record<string, string> = { "pagination[pageSize]": "100" };
+  names.forEach((name, i) => {
+    params[`filters[name][$in][${i}]`] = name;
+  });
+
+  const files = await strapiFetch<{ name: string; url: string }[]>(
+    "/api/upload/files",
+    params
+  );
+  if (files === null) return {};
+
+  const urlByName = new Map(files.map((f) => [f.name, resolveMediaUrl(f.url)]));
+  const result: Partial<Record<VideoKey, string>> = {};
+  for (const [key, name] of Object.entries(VIDEO_NAMES) as [VideoKey, string][]) {
     const url = urlByName.get(name);
     if (url) result[key] = url;
   }

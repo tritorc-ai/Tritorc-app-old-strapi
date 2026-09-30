@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { getCatalogueUrl, getImageUrls, getMediaByCaption, getProduct } from "@/lib/strapi";
+import { getCatalogueUrl, getImageUrls, getMediaByCaption, getProduct, getVideoUrls } from "@/lib/strapi";
 import { ProductDetailView } from "@/components/app/ProductDetailView";
 import type { ImageKey } from "@/lib/mock/images";
+import type { VideoKey } from "@/lib/mock/videos";
 import type { ProductMediaAsset } from "@/lib/mock/content";
 
 // Real, verified multi-shot product photography we found for these two
@@ -15,11 +16,22 @@ const EXTRA_GALLERY_KEYS: Record<string, ImageKey[]> = {
   "btl-19": ["productTensionerHero", "libraryBtlPhoto", "btlGallery2", "btlGallery3", "btlGallery4"],
 };
 
+// Real product-overview videos found in the Media Library for these
+// specific products — additive on top of whatever photo media resolves
+// above (no video caption convention exists yet, so there's no conflict).
+const EXTRA_VIDEO_KEYS: Record<string, VideoKey[]> = {
+  "btl-19": ["prodBtl"],
+  "pipe-cold-cutting-beveling-machines": ["prodPipeCutting"],
+  "tube-pipe-beveling-machine": ["prodTubeBeveling"],
+  "tube-removal-tools": ["prodTubeRemoval"],
+};
+
 export default async function ProductDetailPage(props: PageProps<"/products/[slug]">) {
   const { slug } = await props.params;
-  const [product, images, captionMedia] = await Promise.all([
+  const [product, images, videos, captionMedia] = await Promise.all([
     getProduct(slug),
     getImageUrls(),
+    getVideoUrls(),
     getMediaByCaption(`product:${slug}`),
   ]);
   if (!product) notFound();
@@ -47,12 +59,23 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
     // "thumbnail" is used by the Products listing page, not the detail page.
   });
 
-  const combinedMedia =
+  const combinedPhotoMedia =
     captionMediaAssets.length > 0
       ? [...product.media, ...captionMediaAssets]
       : fallbackMedia.length > 0
         ? [...product.media, ...fallbackMedia]
         : product.media;
+
+  const videoKeys = EXTRA_VIDEO_KEYS[slug] ?? [];
+  const videoMedia: ProductMediaAsset[] = videoKeys
+    .map((key, i) => {
+      const url = videos[key];
+      if (!url) return null;
+      return { id: `${slug}-video-${i}`, kind: "video", context: "product", url } as ProductMediaAsset;
+    })
+    .filter((m): m is ProductMediaAsset => m !== null);
+
+  const combinedMedia = [...combinedPhotoMedia, ...videoMedia];
 
   const catalogueUrl = product.catalogue ? await getCatalogueUrl(product.catalogue.title) : undefined;
   const productWithMedia = {

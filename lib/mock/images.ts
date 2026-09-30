@@ -71,23 +71,44 @@ export const IMAGE_NAMES = {
   // Reusing already-verified Tritorc-branded photos where they genuinely
   // fit, rather than the official site's own (often generic/stock, and in
   // one case third-party-branded) service card images.
-  svcPipeFreezing: "ppc-images-hottapping-pipe-4-png-7fff864973cb7522.png",
-  svcNitrogenPurging: "ppc-images-hottapping-pipe-3-png-54218a0b38f29198.png",
+  svcPipeFreezing: "Pipe Freezing 402.jpg",
   svcDryRental: "ppc-images-collage-dry-rental-gen-new-01-jpg-23d7a99e526fef90.jpg",
 
-  // Previously 5 services (Dewatering, Hydro Testing, Lube-oil Flushing,
-  // Nitrogen Helium Leak Testing, Pneumatic Testing) all shared one image
-  // (svcPipelineIntegrity) and 3 more (Emergency Repair Clamp, Hot Tapping,
-  // Online Leak Sealing) shared another (svcHotTapping). Split each out to
-  // its own real, distinct Media Library photo — no two services below
-  // point at the same file anymore.
-  svcDewatering: "ppc-images-hottapping-hottapping-img-png-40b239b5802b294c.png",
-  svcHydroTesting: "ppc-images-twp-3-webp-11e844ef3c56d022.webp",
-  svcLubeOilFlushing: "ppc-images-hottapping-hottapping-2-optimized-webp-43e4a8751299cbe1.webp",
-  svcNitrogenHeliumLeak: "ppc-images-hottapping-hot-tapping-3-webp-798148db0b105ee5.webp",
-  svcPneumaticTesting: "ppc-images-hottapping-hot-tapping-4-webp-b33c536ec6f99718.webp",
+  // Emergency Repair Clamp / Online Leak Sealing still share the Hot Tapping
+  // folder's thematically-relevant (not literal) photos — no real photo of
+  // those two specific services has been provided yet.
   svcEmergencyRepairClamp: "ppc-images-hottapping-fittings-optimized-webp-8cb84bebd77a162d.webp",
   svcOnlineLeakSealing: "ppc-images-hottapping-gcc-home-webp-e71633422678257a.webp",
+
+  // Real, literal photos of each Process & Pipeline service (Aug 2026 media
+  // batch) — replaces the earlier thematically-relevant Hot Tapping crops.
+  svcDewatering: "Dewatering and Dry Air flushing.jpg",
+  svcHydroTesting: "Hydro-Testing.jpg",
+  svcLubeOilFlushing: "Lube Oil Flushing.jpg",
+  svcNitrogenHeliumLeak: "Nitrogen Helium Leak Test.jpg",
+  svcNitrogenPurging: "Nitrogen Purging New 001.JPG",
+  svcPneumaticTesting: "Pneumatic Testing 01.jpg",
+  lubeOilGallery1: "0 Lube Oil Flushing A.jpg",
+  lubeOilGallery2: "Lube Oil 001.jpg",
+  lubeOilGallery3: "Lube Oil 002.jpg",
+  nitrogenPurgingGallery1: "0 Nitrogen Purging A.jpg",
+  nitrogenPurgingGallery2: "Nitrogen-purging.jpg",
+  nitrogenPreservationGallery1: "Nitrogen Preservation.jpg",
+  nitrogenPreservationGallery2: "Nitrogen-Preservation.jpg",
+
+  // Real On-Site Milling photo — was falling back to the official site's
+  // external directImageUrl before this batch.
+  svcOnSiteMilling: "Milling Machine 01.jpg",
+
+  // Real Pipe Freezing in-use gallery (svcPipeFreezing above is the hero).
+  pipeFreezingGallery1: "Pipe Freezing 410.jpg",
+  pipeFreezingGallery2: "Pipe Freezing 411.jpg",
+  pipeFreezingGallery3: "Pipe Freezing 413.jpg",
+  pipeFreezingGallery4: "Pipe Freezing Application 01.jpg",
+  pipeFreezingGallery5: "Pipe Freezing New 51.jpg",
+  pipeFreezingGallery6: "Pipe Freezing New 52.jpg",
+  pipeFreezingGallery7: "Pipe Freezing New 53.jpg",
+  pipeFreezingGallery8: "Pipe Freezing New 54.jpg",
 
   // Extra in-use gallery shots for Hot Tapping & Line Stopping — real photos
   // from the Media Library not used as any hero image elsewhere.

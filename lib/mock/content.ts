@@ -233,10 +233,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
   { name: "Onsite Controlled Bolting", imageKey: "productTorqueHero" },
   { name: "Pipeline Coldcutting & Bevelling", imageKey: "catPipeColdCutting" },
   { name: "Flange Facing", imageKey: "catFlangeFacing" },
-  {
-    name: "On-Site Milling",
-    directImageUrl: "https://www.tritorc.com/assets/services/Oniste%20Machining.jpg",
-  },
+  { name: "On-Site Milling", imageKey: "svcOnSiteMilling" },
   {
     name: "Magnetic Drilling Machine",
     directImageUrl: "https://www.tritorc.com/assets/services/pro/mgntic.webp",
@@ -313,7 +310,7 @@ export const SERVICES: Service[] = [
     tagline: "Precision milling, no facility downtime",
     description:
       "On-site milling operations brought directly to your facility, eliminating the need for costly equipment removal and transport.",
-    directImageUrl: "https://www.tritorc.com/assets/services/Oniste%20Machining.jpg",
+    imageKey: "svcOnSiteMilling",
     media: [],
     catalogue: ONSITE_MACHINING_SERVICE_CATALOGUE,
   },
