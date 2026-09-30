@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, X } from "lucide-react";
+import { Download, Share, X } from "lucide-react";
 
 // Chrome/Edge/Android only — Safari and Firefox never fire this event, so
 // the button simply never appears there (installing is manual via each
@@ -13,13 +13,33 @@ interface BeforeInstallPromptEvent extends Event {
 
 const DISMISSED_KEY = "tritorc-install-dismissed";
 
+// iOS never fires beforeinstallprompt — there's no programmatic install API,
+// only the user manually tapping Share -> Add to Home Screen. Detected via
+// UA (including iPadOS 13+, which reports as a touch-capable "MacIntel"),
+// excluding other iOS browser shells (Chrome/Firefox/Edge/Opera) that share
+// Safari's engine but don't expose the same Share-sheet instructions.
+function isIosSafari(): boolean {
+  const ua = navigator.userAgent;
+  const isIos = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isOtherBrowser = /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  return isIos && !isOtherBrowser;
+}
+
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showIosHint, setShowIosHint] = useState(false);
 
   useEffect(() => {
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
     const dismissed = sessionStorage.getItem(DISMISSED_KEY) === "1";
     if (isStandalone || dismissed) return;
+
+    // Deliberately deferred to an effect rather than computed during render:
+    // navigator/matchMedia/sessionStorage aren't available during SSR, and
+    // computing this synchronously on the client's first render would mismatch
+    // the server-rendered (null) output and trigger a hydration error.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (isIosSafari()) setShowIosHint(true);
 
     function handler(e: Event) {
       e.preventDefault();
@@ -29,7 +49,7 @@ export function InstallPrompt() {
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
-  if (!deferredPrompt) return null;
+  if (!deferredPrompt && !showIosHint) return null;
 
   async function handleInstall() {
     if (!deferredPrompt) return;
@@ -41,6 +61,7 @@ export function InstallPrompt() {
   function handleDismiss() {
     sessionStorage.setItem(DISMISSED_KEY, "1");
     setDeferredPrompt(null);
+    setShowIosHint(false);
   }
 
   return (
@@ -49,18 +70,29 @@ export function InstallPrompt() {
       style={{ bottom: "calc(64px + env(safe-area-inset-bottom, 0px))" }}
     >
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-        <Download size={15} />
+        {deferredPrompt ? <Download size={15} /> : <Share size={15} />}
       </div>
       <div className="min-w-0 flex-1">
         <div className="text-[12.5px] font-semibold text-white">Install Tritorc App</div>
-        <div className="text-[10.5px] text-white/60">Faster access, works like a native app</div>
+        <div className="text-[10.5px] text-white/60">
+          {deferredPrompt ? (
+            "Faster access, works like a native app"
+          ) : (
+            <>
+              Tap <span className="font-semibold text-white/80">Share</span>, then{" "}
+              <span className="font-semibold text-white/80">Add to Home Screen</span>
+            </>
+          )}
+        </div>
       </div>
-      <button
-        onClick={handleInstall}
-        className="shrink-0 rounded-md bg-brand-red px-3 py-1.5 text-[11.5px] font-semibold text-white"
-      >
-        Install
-      </button>
+      {deferredPrompt && (
+        <button
+          onClick={handleInstall}
+          className="shrink-0 rounded-md bg-brand-red px-3 py-1.5 text-[11.5px] font-semibold text-white"
+        >
+          Install
+        </button>
+      )}
       <button
         onClick={handleDismiss}
         aria-label="Dismiss"
